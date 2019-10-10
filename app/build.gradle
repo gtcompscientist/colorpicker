@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-	compileSdkVersion 28
-	buildToolsVersion '28.0.3'
+	compileSdkVersion android_versions.compileSdk
+	buildToolsVersion android_versions.buildToolsVersion
 
 	defaultConfig {
 		applicationId "com.flask.colorpicker.sample"
-		minSdkVersion 14
-		targetSdkVersion 28
-		versionCode 9
-		versionName "1.0.9"
+		minSdkVersion android_versions.minSdk
+		targetSdkVersion android_versions.targetSdk
+		versionCode 10
+		versionName "2.0.0"
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 	}
@@ -24,16 +24,14 @@ android {
 //	buildTypes {
 //		release {
 //			minifyEnabled false
-//			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//				signingConfig signingConfigs.release
+//			signingConfig signingConfigs.release
 //		}
 //	}
 }
 
 dependencies {
-	implementation fileTree(dir: 'libs', include: ['*.jar'])
 	implementation project(":library")
-	implementation 'androidx.appcompat:appcompat:1.0.0'
-	implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
-	implementation 'com.google.android.material:material:1.0.0'
+	implementation android_libs.appCompat
+	implementation android_libs.constraintLayout
+	implementation android_libs.material
 }

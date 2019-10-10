@@ -1,24 +1,25 @@
 apply plugin: 'com.android.library'
 
 android {
-	compileSdkVersion 28
-	buildToolsVersion '28.0.3'
+	compileSdkVersion android_versions.compileSdk
+	buildToolsVersion android_versions.buildToolsVersion
 
 	defaultConfig {
-		minSdkVersion 14
-		targetSdkVersion 28
+		minSdkVersion android_versions.minSdk
+		targetSdkVersion android_versions.targetSdk
 		versionCode 15
 		versionName "0.0.15"
 	}
+
+
 	buildTypes {
 		release {
 			minifyEnabled false
-			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			consumerProguardFiles += "consumer-rules.pro"
 		}
 	}
 }
 
 dependencies {
-	implementation fileTree(dir: 'libs', include: ['*.jar'])
-	implementation 'androidx.appcompat:appcompat:1.0.0'
+	implementation android_libs.appCompat
 }
