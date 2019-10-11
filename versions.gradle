@@ -28,5 +28,6 @@ def android_libs = [:]
 android_libs.appCompat = "androidx.appcompat:appcompat:1.1.0"
 android_libs.constraintLayout = "androidx.constraintlayout:constraintlayout:2.0.0-beta2"
 android_libs.material = "com.google.android.material:material:1.0.0"
+android_libs.kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${build_versions.kotlin}"
 
 rootProject.ext['android_libs'] = android_libs

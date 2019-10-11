@@ -1,82 +1,74 @@
-package com.flask.colorpicker.builder;
+package com.flask.colorpicker.builder
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Shader;
+import android.graphics.*
+import kotlin.math.roundToInt
 
-public class PaintBuilder {
-	public static PaintHolder newPaint() {
-		return new PaintHolder();
-	}
+object PaintBuilder {
+    fun newPaint(): PaintHolder {
+        return PaintHolder()
+    }
 
-	public static class PaintHolder {
-		private Paint paint;
+    class PaintHolder {
+        private val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-		private PaintHolder() {
-			this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		}
+        fun color(color: Int): PaintHolder {
+            this.paint.color = color
+            return this
+        }
 
-		public PaintHolder color(int color) {
-			this.paint.setColor(color);
-			return this;
-		}
+        fun antiAlias(flag: Boolean): PaintHolder {
+            this.paint.isAntiAlias = flag
+            return this
+        }
 
-		public PaintHolder antiAlias(boolean flag) {
-			this.paint.setAntiAlias(flag);
-			return this;
-		}
+        fun style(style: Paint.Style): PaintHolder {
+            this.paint.style = style
+            return this
+        }
 
-		public PaintHolder style(Paint.Style style) {
-			this.paint.setStyle(style);
-			return this;
-		}
+        fun mode(mode: PorterDuff.Mode): PaintHolder {
+            this.paint.xfermode = PorterDuffXfermode(mode)
+            return this
+        }
 
-		public PaintHolder mode(PorterDuff.Mode mode) {
-			this.paint.setXfermode(new PorterDuffXfermode(mode));
-			return this;
-		}
+        fun stroke(width: Float): PaintHolder {
+            this.paint.strokeWidth = width
+            return this
+        }
 
-		public PaintHolder stroke(float width) {
-			this.paint.setStrokeWidth(width);
-			return this;
-		}
+        fun xPerMode(mode: PorterDuff.Mode): PaintHolder {
+            this.paint.xfermode = PorterDuffXfermode(mode)
+            return this
+        }
 
-		public PaintHolder xPerMode(PorterDuff.Mode mode) {
-			this.paint.setXfermode(new PorterDuffXfermode(mode));
-			return this;
-		}
+        fun shader(shader: Shader): PaintHolder {
+            this.paint.shader = shader
+            return this
+        }
 
-		public PaintHolder shader(Shader shader) {
-			this.paint.setShader(shader);
-			return this;
-		}
+        fun build() = paint
+    }
 
-		public Paint build() {
-			return this.paint;
-		}
-	}
+    fun createAlphaPatternShader(size: Int): Shader {
+        var size = size
+        size /= 2
+        size = 8.coerceAtLeast(size * 2)
+        return BitmapShader(createAlphaBackgroundPattern(size), Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
+    }
 
-	public static Shader createAlphaPatternShader(int size) {
-		size /= 2;
-		size = Math.max(8, size * 2);
-		return new BitmapShader(createAlphaBackgroundPattern(size), Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-	}
-
-	private static Bitmap createAlphaBackgroundPattern(int size) {
-		Paint alphaPatternPaint = PaintBuilder.newPaint().build();
-		Bitmap bm = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(bm);
-		int s = Math.round(size / 2f);
-		for (int i = 0; i < 2; i++)
-			for (int j = 0; j < 2; j++) {
-				if ((i + j) % 2 == 0) alphaPatternPaint.setColor(0xffffffff);
-				else alphaPatternPaint.setColor(0xffd0d0d0);
-				c.drawRect(i * s, j * s, (i + 1) * s, (j + 1) * s, alphaPatternPaint);
-			}
-		return bm;
-	}
+    private fun createAlphaBackgroundPattern(size: Int): Bitmap {
+        val alphaPatternPaint = newPaint().build()
+        val bm = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val c = Canvas(bm)
+        val s = (size / 2f).roundToInt()
+        for (i in 0..1)
+            for (j in 0..1) {
+                if ((i + j) % 2 == 0)
+                    alphaPatternPaint.color = -0x1
+                else
+                    alphaPatternPaint.color = -0x2f2f30
+                c.drawRect((i * s).toFloat(), (j * s).toFloat(), ((i + 1) * s).toFloat(), ((j + 1) * s).toFloat(), alphaPatternPaint)
+            }
+        return bm
+    }
 }

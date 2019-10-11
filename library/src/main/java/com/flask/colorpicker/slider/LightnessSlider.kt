@@ -1,74 +1,62 @@
-package com.flask.colorpicker.slider;
+package com.flask.colorpicker.slider
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.util.AttributeSet;
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.util.AttributeSet
 
-import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.Utils;
-import com.flask.colorpicker.builder.PaintBuilder;
+import com.flask.colorpicker.ColorPickerView
+import com.flask.colorpicker.applyLightness
+import com.flask.colorpicker.builder.PaintBuilder
+import com.flask.colorpicker.lightness
 
-public class LightnessSlider extends AbsCustomSlider {
-	private int color;
-	private Paint barPaint = PaintBuilder.newPaint().build();
-	private Paint solid = PaintBuilder.newPaint().build();
-	private Paint clearingStroke = PaintBuilder.newPaint().color(0xffffffff).xPerMode(PorterDuff.Mode.CLEAR).build();
+@Suppress("ConvertSecondaryConstructorToPrimary")
+class LightnessSlider : AbsCustomSlider {
+    private var color: Int = 0
+    private val barPaint = PaintBuilder.newPaint().build()
+    private val solid = PaintBuilder.newPaint().build()
+    private val clearingStroke = PaintBuilder.newPaint().color(-0x1).xPerMode(PorterDuff.Mode.CLEAR).build()
 
-	private ColorPickerView colorPicker;
+    var colorPicker: ColorPickerView? = null
 
-	public LightnessSlider(Context context) {
-		super(context);
-	}
+    @JvmOverloads
+    constructor(context: Context? = null, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : super(context, attrs, defStyleAttr)
 
-	public LightnessSlider(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
+    override fun drawBar(barCanvas: Canvas) {
+        val width = barCanvas.width
+        val height = barCanvas.height
 
-	public LightnessSlider(Context context, AttributeSet attrs, int defStyleAttr) {
-		super(context, attrs, defStyleAttr);
-	}
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        val l = 2.coerceAtLeast(width / 256)
+        var x = 0
+        while (x <= width) {
+            hsv[2] = x.toFloat() / (width - 1)
+            barPaint.color = Color.HSVToColor(hsv)
+            barCanvas.drawRect(x.toFloat(), 0f, (x + l).toFloat(), height.toFloat(), barPaint)
+            x += l
+        }
+    }
 
-	@Override
-	protected void drawBar(Canvas barCanvas) {
-		int width = barCanvas.getWidth();
-		int height = barCanvas.getHeight();
+    override fun onValueChanged(value: Float) {
+        colorPicker?.setLightness(value)
+    }
 
-		float[] hsv = new float[3];
-		Color.colorToHSV(color, hsv);
-		int l = Math.max(2, width / 256);
-		for (int x = 0; x <= width; x += l) {
-			hsv[2] = (float) x / (width - 1);
-			barPaint.setColor(Color.HSVToColor(hsv));
-			barCanvas.drawRect(x, 0, x + l, height, barPaint);
-		}
-	}
+    override fun drawHandle(canvas: Canvas, x: Float, y: Float) {
+        solid.color = color.applyLightness(value)
+        if (showBorder) {
+            canvas.drawCircle(x, y, handleRadius.toFloat(), clearingStroke)
+        }
+        canvas.drawCircle(x, y, handleRadius * 0.75f, solid)
+    }
 
-	@Override
-	protected void onValueChanged(float value) {
-		if (colorPicker != null)
-			colorPicker.setLightness(value);
-	}
-
-	@Override
-	protected void drawHandle(Canvas canvas, float x, float y) {
-		solid.setColor(Utils.colorAtLightness(color, value));
-		if (showBorder) canvas.drawCircle(x, y, handleRadius, clearingStroke);
-		canvas.drawCircle(x, y, handleRadius * 0.75f, solid);
-	}
-
-	public void setColorPicker(ColorPickerView colorPicker) {
-		this.colorPicker = colorPicker;
-	}
-
-	public void setColor(int color) {
-		this.color = color;
-		this.value = Utils.lightnessOfColor(color);
-		if (bar != null) {
-			updateBar();
-			invalidate();
-		}
-	}
+    fun setColor(input: Int) {
+        color = input
+        value = input.lightness
+        if (bar != null) {
+            updateBar()
+            invalidate()
+        }
+    }
 }

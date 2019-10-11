@@ -1,46 +1,46 @@
-package com.flask.colorpicker.renderer;
+package com.flask.colorpicker.renderer
 
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.Color
+import com.flask.colorpicker.ColorCircle
+import com.flask.colorpicker.builder.PaintBuilder
+import kotlin.math.cos
+import kotlin.math.sin
 
-import com.flask.colorpicker.ColorCircle;
-import com.flask.colorpicker.builder.PaintBuilder;
+class SimpleColorWheelRenderer : AbsColorWheelRenderer() {
+    private val selectorFill = PaintBuilder.newPaint().build()
+    private val hsv = FloatArray(3)
 
-public class SimpleColorWheelRenderer extends AbsColorWheelRenderer {
-	private Paint selectorFill = PaintBuilder.newPaint().build();
-	private float[] hsv = new float[3];
+    override fun draw() {
+        val setSize = colorCircleList.size
+        var currentCount = 0
+        val half = (renderOption.targetCanvas?.width ?: 0) / 2f
+        val density = renderOption.density
+        val maxRadius = renderOption.maxRadius
 
-	@Override
-	public void draw() {
-		final int setSize = colorCircleList.size();
-		int currentCount = 0;
-		float half = colorWheelRenderOption.targetCanvas.getWidth() / 2f;
-		int density = colorWheelRenderOption.density;
-		float maxRadius = colorWheelRenderOption.maxRadius;
+        for (i in 0 until density) {
+            val p = i.toFloat() / (density - 1) // 0~1
+            val radius = maxRadius * p
+            val size = renderOption.cSize
+            val total = calcTotalCount(radius, size)
 
-		for (int i = 0; i < density; i++) {
-			float p = (float) i / (density - 1); // 0~1
-			float radius = maxRadius * p;
-			float size = colorWheelRenderOption.cSize;
-			int total = calcTotalCount(radius, size);
+            for (j in 0 until total) {
+                val angle = Math.PI * 2.0 * j.toDouble() / total + Math.PI / total * ((i + 1) % 2)
+                val x = half + (radius * cos(angle)).toFloat()
+                val y = half + (radius * sin(angle)).toFloat()
+                hsv[0] = (angle * 180 / Math.PI).toFloat()
+                hsv[1] = radius / maxRadius
+                hsv[2] = renderOption.lightness
+                selectorFill.color = Color.HSVToColor(hsv)
+                selectorFill.alpha = alphaValueAsInt
 
-			for (int j = 0; j < total; j++) {
-				double angle = Math.PI * 2 * j / total + (Math.PI / total) * ((i + 1) % 2);
-				float x = half + (float) (radius * Math.cos(angle));
-				float y = half + (float) (radius * Math.sin(angle));
-				hsv[0] = (float) (angle * 180 / Math.PI);
-				hsv[1] = radius / maxRadius;
-				hsv[2] = colorWheelRenderOption.lightness;
-				selectorFill.setColor(Color.HSVToColor(hsv));
-				selectorFill.setAlpha(getAlphaValueAsInt());
+                renderOption.targetCanvas?.drawCircle(x, y, size - renderOption.strokeWidth, selectorFill)
 
-				colorWheelRenderOption.targetCanvas.drawCircle(x, y, size - colorWheelRenderOption.strokeWidth, selectorFill);
-
-				if (currentCount >= setSize)
-					colorCircleList.add(new ColorCircle(x, y, hsv));
-				else colorCircleList.get(currentCount).set(x, y, hsv);
-				currentCount++;
-			}
-		}
-	}
+                if (currentCount >= setSize)
+                    colorCircleList.add(ColorCircle(x, y, hsv))
+                else
+                    colorCircleList[currentCount][x, y] = hsv
+                currentCount++
+            }
+        }
+    }
 }

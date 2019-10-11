@@ -1,10 +1,13 @@
-package com.flask.colorpicker.renderer;
+package com.flask.colorpicker.renderer
 
-import android.graphics.Canvas;
+import android.graphics.Canvas
 
-public class ColorWheelRenderOption {
-	public int density;
-	public float maxRadius;
-	public float cSize, strokeWidth, alpha, lightness;
-	public Canvas targetCanvas;
-}
+data class ColorWheelRenderOption(
+    var density: Int = 0,
+    var maxRadius: Float = 0f,
+    var cSize: Float = 0f,
+    var strokeWidth: Float = 0f,
+    var alpha: Float = 0f,
+    var lightness: Float = 0f,
+    var targetCanvas: Canvas? = null
+)

@@ -1,34 +1,21 @@
-package com.flask.colorpicker.renderer;
+package com.flask.colorpicker.renderer
 
-import com.flask.colorpicker.ColorCircle;
+import com.flask.colorpicker.ColorCircle
+import kotlin.math.asin
+import kotlin.math.roundToInt
 
-import java.util.ArrayList;
-import java.util.List;
+abstract class AbsColorWheelRenderer : ColorWheelRenderer {
+    private val circleList = arrayListOf<ColorCircle>()
 
-public abstract class AbsColorWheelRenderer implements ColorWheelRenderer {
-	protected ColorWheelRenderOption colorWheelRenderOption;
-	protected List<ColorCircle> colorCircleList = new ArrayList<>();
+    override var renderOption: ColorWheelRenderOption = ColorWheelRenderOption()
 
-	public void initWith(ColorWheelRenderOption colorWheelRenderOption) {
-		this.colorWheelRenderOption = colorWheelRenderOption;
-		this.colorCircleList.clear();
-	}
+    protected val alphaValueAsInt: Int
+        get() = (renderOption.alpha * 255).roundToInt()
 
-	@Override
-	public ColorWheelRenderOption getRenderOption() {
-		if (colorWheelRenderOption == null) colorWheelRenderOption = new ColorWheelRenderOption();
-		return colorWheelRenderOption;
-	}
+    override val colorCircleList
+        get() = circleList
 
-	public List<ColorCircle> getColorCircleList() {
-		return colorCircleList;
-	}
-
-	protected int getAlphaValueAsInt() {
-		return Math.round(colorWheelRenderOption.alpha * 255);
-	}
-
-	protected int calcTotalCount(float radius, float size) {
-		return Math.max(1, (int) ((1f - GAP_PERCENTAGE) * Math.PI / (Math.asin(size / radius)) + 0.5f));
-	}
+    protected fun calcTotalCount(radius: Float, size: Float): Int {
+        return 1.coerceAtLeast(((1f - ColorWheelRenderer.GAP_PERCENTAGE) * Math.PI / asin((size / radius).toDouble()) + 0.5f).toInt())
+    }
 }

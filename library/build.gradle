@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
 	compileSdkVersion android_versions.compileSdk
@@ -22,4 +24,5 @@ android {
 
 dependencies {
 	implementation android_libs.appCompat
+	implementation android_libs.kotlin
 }

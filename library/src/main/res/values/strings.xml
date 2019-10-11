@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="color_value">Color Value</string>
+    <string name="color_preview">Color Preview</string>
+    <string name="color_widget">Color Widget</string>
+</resources>

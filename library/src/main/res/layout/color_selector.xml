@@ -8,5 +8,6 @@
         android:layout_width="@dimen/default_preview_image_height"
         android:layout_height="@dimen/default_preview_image_height"
         android:src="@android:color/transparent"
-        android:id="@+id/image_preview"/>
+        android:id="@+id/image_preview"
+        android:contentDescription="@string/color_preview" />
 </LinearLayout>

@@ -1,10 +1,10 @@
-package com.flask.colorpicker.builder;
+package com.flask.colorpicker.builder
 
-import android.content.DialogInterface;
+import android.content.DialogInterface
 
 /**
  * Created by Charles Anderson on 4/17/15.
  */
-public interface ColorPickerClickListener {
-    void onClick(DialogInterface d, int lastSelectedColor, Integer[] allColors);
+interface ColorPickerClickListener {
+    fun onClick(d: DialogInterface, lastSelectedColor: Int, colors: Array<Int?>)
 }

@@ -1,5 +1,8 @@
-package com.flask.colorpicker;
+package com.flask.colorpicker
 
-public interface OnColorChangedListener {
-	void onColorChanged(int selectedColor);
+/**
+ * Allows listening to the color change events
+ */
+interface OnColorChangedListener {
+    fun onColorChanged(selectedColor: Int)
 }

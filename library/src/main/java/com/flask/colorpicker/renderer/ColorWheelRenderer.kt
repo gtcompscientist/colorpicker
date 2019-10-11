@@ -1,17 +1,16 @@
-package com.flask.colorpicker.renderer;
+package com.flask.colorpicker.renderer
 
-import com.flask.colorpicker.ColorCircle;
+import com.flask.colorpicker.ColorCircle
 
-import java.util.List;
+interface ColorWheelRenderer {
 
-public interface ColorWheelRenderer {
-	float GAP_PERCENTAGE = 0.025f;
+    var renderOption: ColorWheelRenderOption
 
-	void draw();
+    val colorCircleList: MutableList<ColorCircle>
 
-	ColorWheelRenderOption getRenderOption();
+    fun draw()
 
-	void initWith(ColorWheelRenderOption colorWheelRenderOption);
-
-	List<ColorCircle> getColorCircleList();
+    companion object {
+        const val GAP_PERCENTAGE = 0.025f
+    }
 }

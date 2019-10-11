@@ -38,11 +38,11 @@ public class SampleActivity extends AppCompatActivity {
 			public void onClick(View v) {
 				final Context context = SampleActivity.this;
 
-				ColorPickerDialogBuilder
+				ColorPickerDialogBuilder.Companion
 						.with(context)
 						.setTitle(R.string.color_dialog_title)
 						.initialColor(currentBackgroundColor)
-						.wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+						.wheelType(ColorPickerView.WheelType.FLOWER)
 						.density(12)
 						.setOnColorChangedListener(new OnColorChangedListener() {
 							@Override

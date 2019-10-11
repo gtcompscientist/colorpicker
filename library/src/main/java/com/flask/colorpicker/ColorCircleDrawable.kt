@@ -1,39 +1,33 @@
-package com.flask.colorpicker;
+package com.flask.colorpicker
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.drawable.ColorDrawable
 
-import com.flask.colorpicker.builder.PaintBuilder;
+import com.flask.colorpicker.builder.PaintBuilder
 
-public class ColorCircleDrawable extends ColorDrawable {
-	private float strokeWidth;
-	private Paint strokePaint = PaintBuilder.newPaint().style(Paint.Style.STROKE).stroke(strokeWidth).color(0xff9e9e9e).build();
-	private Paint fillPaint = PaintBuilder.newPaint().style(Paint.Style.FILL).color(0).build();
-	private Paint fillBackPaint = PaintBuilder.newPaint().shader(PaintBuilder.createAlphaPatternShader(26)).build();
+class ColorCircleDrawable(color: Int) : ColorDrawable(color) {
+    private var strokeWidth: Float = 0.toFloat()
+    private val strokePaint = PaintBuilder.newPaint().style(Paint.Style.STROKE).stroke(strokeWidth).color(-0x616162).build()
+    private val fillPaint = PaintBuilder.newPaint().style(Paint.Style.FILL).color(0).build()
+    private val fillBackPaint = PaintBuilder.newPaint().shader(PaintBuilder.createAlphaPatternShader(26)).build()
 
-	public ColorCircleDrawable(int color) {
-		super(color);
-	}
+    override fun draw(canvas: Canvas) {
+        canvas.drawColor(0)
 
-	@Override
-	public void draw(Canvas canvas) {
-		canvas.drawColor(0);
+        val width = canvas.width
+        val radius = width / 2f
+        strokeWidth = radius / 8f
 
-		int width = canvas.getWidth();
-		float radius = width / 2f;
-		strokeWidth = radius / 8f;
+        this.strokePaint.strokeWidth = strokeWidth
+        this.fillPaint.color = color
+        canvas.drawCircle(radius, radius, radius - strokeWidth, fillBackPaint)
+        canvas.drawCircle(radius, radius, radius - strokeWidth, fillPaint)
+        canvas.drawCircle(radius, radius, radius - strokeWidth, strokePaint)
+    }
 
-		this.strokePaint.setStrokeWidth(strokeWidth);
-		this.fillPaint.setColor(getColor());
-		canvas.drawCircle(radius, radius, radius - strokeWidth, fillBackPaint);
-		canvas.drawCircle(radius, radius, radius - strokeWidth, fillPaint);
-		canvas.drawCircle(radius, radius, radius - strokeWidth, strokePaint);
-	}
-
-	@Override
-	public void setColor(int color) {
-		super.setColor(color);
-		invalidateSelf();
-	}
+    override fun setColor(color: Int) {
+        super.setColor(color)
+        invalidateSelf()
+    }
 }

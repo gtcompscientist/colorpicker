@@ -1,189 +1,156 @@
-package com.flask.colorpicker.slider;
+package com.flask.colorpicker.slider
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.PorterDuff;
-import androidx.annotation.DimenRes;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.View;
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.PorterDuff
+import android.util.AttributeSet
+import android.view.MotionEvent
+import android.view.View
+import androidx.annotation.DimenRes
+import com.flask.colorpicker.R
 
-import com.flask.colorpicker.R;
+@Suppress("ConvertSecondaryConstructorToPrimary")
+abstract class AbsCustomSlider : View {
+    protected var bitmap: Bitmap? = null
+    protected var bitmapCanvas: Canvas? = null
+    protected var bar: Bitmap? = null
+    protected var barCanvas: Canvas? = null
+    protected var onValueChangedListener: OnValueChangedListener? = null
+    protected var barOffsetX: Int = 0
+    protected var handleRadius = 20
+    protected var barHeight = 5
+    protected var value = 1f
+    protected var showBorder = false
 
-public abstract class AbsCustomSlider extends View {
-	protected Bitmap bitmap;
-	protected Canvas bitmapCanvas;
-	protected Bitmap bar;
-	protected Canvas barCanvas;
-	protected OnValueChangedListener onValueChangedListener;
-	protected int barOffsetX;
-	protected int handleRadius = 20;
-	protected int barHeight = 5;
-	protected float value = 1;
-	protected boolean showBorder = false;
+    private var inVerticalOrientation = false
 
-	private boolean inVerticalOrientation = false;
+    @JvmOverloads
+    constructor(context: Context? = null, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : super(context, attrs, defStyleAttr) {
+        val styledAttrs = context?.theme?.obtainStyledAttributes(
+                attrs, R.styleable.AbsCustomSlider, 0, 0)
+        try {
+            inVerticalOrientation = styledAttrs?.getBoolean(
+                    R.styleable.AbsCustomSlider_inVerticalOrientation, inVerticalOrientation)
+                    ?: false
+        } finally {
+            styledAttrs?.recycle()
+        }
+    }
 
-	public AbsCustomSlider(Context context) {
-		super(context);
-		init(context, null);
-	}
+    protected fun updateBar() {
+        handleRadius = getDimension(R.dimen.default_slider_handler_radius)
+        barHeight = getDimension(R.dimen.default_slider_bar_height)
+        barOffsetX = handleRadius
 
-	public AbsCustomSlider(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init(context, attrs);
-	}
+        if (bar == null) {
+            createBitmaps()
+        }
+        barCanvas?.let { drawBar(it) }
+        invalidate()
+    }
 
-	public AbsCustomSlider(Context context, AttributeSet attrs, int defStyleAttr) {
-		super(context, attrs, defStyleAttr);
-		init(context, attrs);
-	}
+    protected open fun createBitmaps() {
+        val width: Int
+        val height: Int
+        if (inVerticalOrientation) {
+            width = getHeight()
+            height = getWidth()
+        } else {
+            width = getWidth()
+            height = getHeight()
+        }
 
-	private void init(Context context, AttributeSet attrs) {
-		TypedArray styledAttrs = context.getTheme().obtainStyledAttributes(
-			attrs, R.styleable.AbsCustomSlider, 0, 0);
-		try {
-			inVerticalOrientation = styledAttrs.getBoolean(
-				R.styleable.AbsCustomSlider_inVerticalOrientation, inVerticalOrientation);
-		} finally {
-			styledAttrs.recycle();
-		}
-	}
+        bar = Bitmap.createBitmap(width - barOffsetX * 2, barHeight, Bitmap.Config.ARGB_8888)
+        barCanvas = bar?.run { Canvas(this) }
 
-	protected void updateBar() {
-		handleRadius = getDimension(R.dimen.default_slider_handler_radius);
-		barHeight = getDimension(R.dimen.default_slider_bar_height);
-		barOffsetX = handleRadius;
+        if (bitmap?.width != width || bitmap?.height != height) {
+            bitmap?.recycle()
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            bitmapCanvas = bitmap?.run { Canvas(this) }
+        }
+    }
 
-		if (bar == null)
-			createBitmaps();
-		drawBar(barCanvas);
-		invalidate();
-	}
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
 
-	protected void createBitmaps() {
-		int width;
-		int height;
-		if (inVerticalOrientation) {
-			width = getHeight();
-			height = getWidth();
-		} else {
-			width = getWidth();
-			height = getHeight();
-		}
+        val width: Int
+        val height: Int
+        if (inVerticalOrientation) {
+            width = getHeight()
+            height = getWidth()
 
-		bar = Bitmap.createBitmap(width - barOffsetX * 2, barHeight, Bitmap.Config.ARGB_8888);
-		barCanvas = new Canvas(bar);
+            canvas.rotate(-90f)
+            canvas.translate((-width).toFloat(), 0f)
+        } else {
+            width = getWidth()
+            height = getHeight()
+        }
 
-		if (bitmap == null || bitmap.getWidth() != width || bitmap.getHeight() != height) {
-			if (bitmap != null) bitmap.recycle();
-			bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			bitmapCanvas = new Canvas(bitmap);
-		}
-	}
+        bar?.let {
+            bitmapCanvas?.drawColor(0, PorterDuff.Mode.CLEAR)
+            bitmapCanvas?.drawBitmap(it, barOffsetX.toFloat(), ((height - it.height) / 2).toFloat(), null)
+        }
+        val x = handleRadius + value * (width - handleRadius * 2)
+        val y = height / 2f
+        bitmapCanvas?.let { drawHandle(it, x, y) }
+        bitmap?.let { canvas.drawBitmap(it, 0f, 0f, null) }
+    }
 
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
+    protected abstract fun drawBar(barCanvas: Canvas)
 
-		int width;
-		int height;
-		if (inVerticalOrientation) {
-			width = getHeight();
-			height = getWidth();
+    protected abstract fun onValueChanged(value: Float)
 
-			canvas.rotate(-90);
-			canvas.translate(-width, 0);
-		} else {
-			width = getWidth();
-			height = getHeight();
-		}
+    protected abstract fun drawHandle(canvas: Canvas, x: Float, y: Float)
 
-		if (bar != null && bitmapCanvas != null) {
-			bitmapCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
-			bitmapCanvas.drawBitmap(bar, barOffsetX, (height - bar.getHeight()) / 2, null);
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        updateBar()
+    }
 
-			float x = handleRadius + value * (width - handleRadius * 2);
-			float y = height / 2f;
-			drawHandle(bitmapCanvas, x, y);
-			canvas.drawBitmap(bitmap, 0, 0, null);
-		}
-	}
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        var width = 0
+        when (widthMode) {
+            MeasureSpec.UNSPECIFIED -> width = widthMeasureSpec
+            MeasureSpec.AT_MOST -> width = MeasureSpec.getSize(widthMeasureSpec)
+            MeasureSpec.EXACTLY -> width = MeasureSpec.getSize(widthMeasureSpec)
+        }
 
-	protected abstract void drawBar(Canvas barCanvas);
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        var height = 0
+        when (heightMode) {
+            MeasureSpec.UNSPECIFIED -> height = heightMeasureSpec
+            MeasureSpec.AT_MOST -> height = MeasureSpec.getSize(heightMeasureSpec)
+            MeasureSpec.EXACTLY -> height = MeasureSpec.getSize(heightMeasureSpec)
+        }
 
-	protected abstract void onValueChanged(float value);
+        setMeasuredDimension(width, height)
+    }
 
-	protected abstract void drawHandle(Canvas canvas, float x, float y);
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        when (event.action) {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                if (bar != null) {
+                    value = if (inVerticalOrientation) {
+                        1 - (event.y - barOffsetX) / (bar?.width ?: 1)
+                    } else {
+                        (event.x - barOffsetX) / (bar?.width ?: 1)
+                    }
+                    value = 0f.coerceAtLeast(value.coerceAtMost(1f))
+                    onValueChanged(value)
+                    invalidate()
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+                onValueChanged(value)
+                onValueChangedListener?.onValueChanged(value)
+                invalidate()
+            }
+        }
+        return true
+    }
 
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		super.onSizeChanged(w, h, oldw, oldh);
-		updateBar();
-	}
-
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-		int width = 0;
-		if (widthMode == MeasureSpec.UNSPECIFIED)
-			width = widthMeasureSpec;
-		else if (widthMode == MeasureSpec.AT_MOST)
-			width = MeasureSpec.getSize(widthMeasureSpec);
-		else if (widthMode == MeasureSpec.EXACTLY)
-			width = MeasureSpec.getSize(widthMeasureSpec);
-
-		int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-		int height = 0;
-		if (heightMode == MeasureSpec.UNSPECIFIED)
-			height = heightMeasureSpec;
-		else if (heightMode == MeasureSpec.AT_MOST)
-			height = MeasureSpec.getSize(heightMeasureSpec);
-		else if (heightMode == MeasureSpec.EXACTLY)
-			height = MeasureSpec.getSize(heightMeasureSpec);
-
-		setMeasuredDimension(width, height);
-	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		switch (event.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-			case MotionEvent.ACTION_MOVE: {
-				if (bar != null) {
-					if (inVerticalOrientation) {
-						value = 1 - (event.getY() - barOffsetX) / bar.getWidth();
-					} else {
-						value = (event.getX() - barOffsetX) / bar.getWidth();
-					}
-					value = Math.max(0, Math.min(value, 1));
-					onValueChanged(value);
-					invalidate();
-				}
-				break;
-			}
-			case MotionEvent.ACTION_UP: {
-				onValueChanged(value);
-				if (onValueChangedListener != null)
-					onValueChangedListener.onValueChanged(value);
-				invalidate();
-			}
-		}
-		return true;
-	}
-
-	protected int getDimension(@DimenRes int id) {
-		return getResources().getDimensionPixelSize(id);
-	}
-
-	public void setShowBorder(boolean showBorder) {
-		this.showBorder = showBorder;
-	}
-
-	public void setOnValueChangedListener(OnValueChangedListener onValueChangedListener) {
-		this.onValueChangedListener = onValueChangedListener;
-	}
+    protected fun getDimension(@DimenRes id: Int): Int = resources.getDimensionPixelSize(id)
 }

@@ -1,155 +1,143 @@
-package com.flask.colorpicker;
+package com.flask.colorpicker
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.preference.Preference;
-import androidx.annotation.NonNull;
-import android.util.AttributeSet;
-import android.view.View;
-import android.widget.ImageView;
+import android.content.Context
+import android.content.DialogInterface
+import android.graphics.Color
+import android.preference.Preference
+import android.util.AttributeSet
+import android.view.View
+import android.widget.ImageView
 
-import com.flask.colorpicker.builder.ColorPickerClickListener;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.flask.colorpicker.builder.ColorPickerClickListener
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 
-public class ColorPickerPreference extends Preference {
+class ColorPickerPreference : Preference {
 
-	protected boolean alphaSlider;
-	protected boolean lightSlider;
-	protected boolean border;
+    protected var alphaSlider: Boolean = false
+    protected var lightSlider: Boolean = false
+    protected var border: Boolean = false
 
-	protected int selectedColor = 0;
+    protected var selectedColor = 0
 
-	protected ColorPickerView.WHEEL_TYPE wheelType;
-	protected int density;
+    protected var wheelType: ColorPickerView.WheelType = ColorPickerView.WheelType.FLOWER
+    protected var density: Int = 0
 
-	private boolean pickerColorEdit;
-	private String pickerTitle;
-	private String pickerButtonCancel;
-	private String pickerButtonOk;
+    private var pickerColorEdit: Boolean = false
+    private var pickerTitle: String? = null
+    private var pickerButtonCancel: String? = null
+    private var pickerButtonOk: String? = null
 
-	protected ImageView colorIndicator;
+    protected lateinit var colorIndicator: ImageView
 
-	public ColorPickerPreference(Context context) {
-		super(context);
-	}
+    @JvmOverloads
+    constructor(context: Context? = null, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : super(context, attrs, defStyleAttr) {
+        val typedArray = context?.obtainStyledAttributes(attrs, R.styleable.ColorPickerView)
 
-	public ColorPickerPreference(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		initWith(context, attrs);
-	}
+        try {
+            typedArray?.let { attributes ->
+                alphaSlider = attributes.getBoolean(R.styleable.ColorPickerView_alphaSlider, false)
+                lightSlider = attributes.getBoolean(R.styleable.ColorPickerView_lightnessSlider, false)
+                border = attributes.getBoolean(R.styleable.ColorPickerView_border, true)
 
-	public ColorPickerPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-		super(context, attrs, defStyleAttr);
-		initWith(context, attrs);
-	}
+                density = attributes.getInt(R.styleable.ColorPickerView_density, 8)
+                wheelType = ColorPickerView.WheelType.indexOf(attributes.getInt(R.styleable.ColorPickerView_wheelType, 0))
 
-	private void initWith(Context context, AttributeSet attrs) {
-		final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ColorPickerPreference);
+                selectedColor = attributes.getInt(R.styleable.ColorPickerView_initialColor, -0x1)
 
-		try {
-			alphaSlider = typedArray.getBoolean(R.styleable.ColorPickerPreference_alphaSlider, false);
-			lightSlider = typedArray.getBoolean(R.styleable.ColorPickerPreference_lightnessSlider, false);
-			border = typedArray.getBoolean(R.styleable.ColorPickerPreference_border, true);
+                pickerColorEdit = attributes.getBoolean(R.styleable.ColorPickerView_pickerColorEdit, true)
+                pickerTitle = attributes.getString(R.styleable.ColorPickerView_pickerTitle)
+                if (pickerTitle == null)
+                    pickerTitle = "Choose color"
 
-			density = typedArray.getInt(R.styleable.ColorPickerPreference_density, 8);
-			wheelType = ColorPickerView.WHEEL_TYPE.indexOf(typedArray.getInt(R.styleable.ColorPickerPreference_wheelType, 0));
+                pickerButtonCancel = attributes.getString(R.styleable.ColorPickerView_pickerButtonCancel)
+                if (pickerButtonCancel == null)
+                    pickerButtonCancel = "cancel"
 
-			selectedColor = typedArray.getInt(R.styleable.ColorPickerPreference_initialColor, 0xffffffff);
+                pickerButtonOk = attributes.getString(R.styleable.ColorPickerView_pickerButtonOk)
+                if (pickerButtonOk == null)
+                    pickerButtonOk = "ok"
+            }
 
-			pickerColorEdit = typedArray.getBoolean(R.styleable.ColorPickerPreference_pickerColorEdit, true);
-			pickerTitle = typedArray.getString(R.styleable.ColorPickerPreference_pickerTitle);
-			if (pickerTitle==null)
-				pickerTitle = "Choose color";
+        } finally {
+            typedArray?.recycle()
+        }
 
-			pickerButtonCancel = typedArray.getString(R.styleable.ColorPickerPreference_pickerButtonCancel);
-			if (pickerButtonCancel==null)
-				pickerButtonCancel = "cancel";
-
-			pickerButtonOk = typedArray.getString(R.styleable.ColorPickerPreference_pickerButtonOk);
-			if (pickerButtonOk==null)
-				pickerButtonOk = "ok";
-
-		} finally {
-			typedArray.recycle();
-		}
-
-		setWidgetLayoutResource(R.layout.color_widget);
-	}
+        widgetLayoutResource = R.layout.color_widget
+    }
 
 
-	@Override
-	protected void onBindView(@NonNull View view) {
-		super.onBindView(view);
+    override fun onBindView(view: View) {
+        super.onBindView(view)
 
-		int tmpColor = isEnabled()
-				? selectedColor
-				: darken(selectedColor, .5f);
+        val tmpColor = if (isEnabled)
+            selectedColor
+        else
+            darken(selectedColor, .5f)
 
-		colorIndicator = (ImageView) view.findViewById(R.id.color_indicator);
+        colorIndicator = view.findViewById<View>(R.id.color_indicator) as ImageView
 
-		ColorCircleDrawable colorChoiceDrawable = null;
-		Drawable currentDrawable = colorIndicator.getDrawable();
-		if (currentDrawable != null && currentDrawable instanceof ColorCircleDrawable)
-			colorChoiceDrawable = (ColorCircleDrawable) currentDrawable;
+        var colorChoiceDrawable: ColorCircleDrawable? = null
+        val currentDrawable = colorIndicator.drawable
+        if (currentDrawable != null && currentDrawable is ColorCircleDrawable)
+            colorChoiceDrawable = currentDrawable
 
-		if (colorChoiceDrawable == null)
-			colorChoiceDrawable = new ColorCircleDrawable(tmpColor);
+        if (colorChoiceDrawable == null)
+            colorChoiceDrawable = ColorCircleDrawable(tmpColor)
 
-		colorIndicator.setImageDrawable(colorChoiceDrawable);
-	}
+        colorIndicator.setImageDrawable(colorChoiceDrawable)
+    }
 
-	public void setValue(int value) {
-		if (callChangeListener(value)) {
-			selectedColor = value;
-			persistInt(value);
-			notifyChanged();
-		}
-	}
+    fun setValue(value: Int) {
+        if (callChangeListener(value)) {
+            selectedColor = value
+            persistInt(value)
+            notifyChanged()
+        }
+    }
 
-	@Override
-	protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-		setValue(restoreValue ? getPersistedInt(0) : (Integer) defaultValue);
-	}
+    override fun onSetInitialValue(restoreValue: Boolean, defaultValue: Any) {
+        setValue(if (restoreValue) getPersistedInt(0) else defaultValue as Int)
+    }
 
-	@Override
-	protected void onClick() {
-		ColorPickerDialogBuilder builder = ColorPickerDialogBuilder
-			.with(getContext())
-			.setTitle(pickerTitle)
-			.initialColor(selectedColor)
-			.showBorder(border)
-			.wheelType(wheelType)
-			.density(density)
-			.showColorEdit(pickerColorEdit)
-			.setPositiveButton(pickerButtonOk, new ColorPickerClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int selectedColorFromPicker, Integer[] allColors) {
-					setValue(selectedColorFromPicker);
-				}
-			})
-			.setNegativeButton(pickerButtonCancel, null);
+    override fun onClick() {
+        val builder = ColorPickerDialogBuilder
+                .with(context)
+                .setTitle(pickerTitle!!)
+                .initialColor(selectedColor)
+                .showBorder(border)
+                .wheelType(wheelType)
+                .density(density)
+                .showColorEdit(pickerColorEdit)
+                .setPositiveButton(pickerButtonOk!!, object : ColorPickerClickListener {
+                    override fun onClick(dialog: DialogInterface, selectedColorFromPicker: Int, allColors: Array<Int?>) {
+                        setValue(selectedColorFromPicker)
+                    }
+                })
+                .setNegativeButton(pickerButtonCancel!!, null!!)
 
-		if (!alphaSlider && !lightSlider) builder.noSliders();
-		else if (!alphaSlider) builder.lightnessSliderOnly();
-		else if (!lightSlider) builder.alphaSliderOnly();
+        if (!alphaSlider && !lightSlider)
+            builder.noSliders()
+        else if (!alphaSlider)
+            builder.lightnessSliderOnly()
+        else if (!lightSlider) builder.alphaSliderOnly()
 
-		builder
-			.build()
-			.show();
-	}
+        builder
+                .build()
+                .show()
+    }
 
-	public static int darken(int color, float factor) {
-		int a = Color.alpha(color);
-		int r = Color.red(color);
-		int g = Color.green(color);
-		int b = Color.blue(color);
+    companion object {
 
-		return Color.argb(a,
-			Math.max((int)(r * factor), 0),
-			Math.max((int)(g * factor), 0),
-			Math.max((int)(b * factor), 0));
-	}
+        fun darken(color: Int, factor: Float): Int {
+            val a = Color.alpha(color)
+            val r = Color.red(color)
+            val g = Color.green(color)
+            val b = Color.blue(color)
+
+            return Color.argb(a,
+                    Math.max((r * factor).toInt(), 0),
+                    Math.max((g * factor).toInt(), 0),
+                    Math.max((b * factor).toInt(), 0))
+        }
+    }
 }
