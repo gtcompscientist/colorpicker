@@ -22,14 +22,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.csadev.colorpicker.ColorPickerEventHandler
 import co.csadev.colorpicker.LaunchedColorPickerEventListener
+import co.csadev.colorpicker.state.ColorPickerState
 import co.csadev.colorpicker.state.rememberColorPickerState
 import kotlinx.coroutines.launch
 
 /**
- * A complete color picker component with sliders and optional text input.
+ * A complete color picker component with color wheel, sliders, and optional text input.
  *
  * @param modifier The modifier to apply to this composable
  * @param initialColor The initial color to display
+ * @param wheelType The type of color wheel (FLOWER or CIRCLE)
+ * @param density The density of color points in the wheel (2-20)
+ * @param showColorWheel Whether to show the interactive color wheel
  * @param showAlphaSlider Whether to show the alpha/transparency slider
  * @param showLightnessSlider Whether to show the lightness/brightness slider
  * @param showColorEdit Whether to show the hex color input field
@@ -40,6 +44,9 @@ import kotlinx.coroutines.launch
 fun ColorPicker(
     modifier: Modifier = Modifier,
     initialColor: Color = Color.White,
+    wheelType: ColorPickerState.WheelType = ColorPickerState.WheelType.FLOWER,
+    density: Int = 10,
+    showColorWheel: Boolean = true,
     showAlphaSlider: Boolean = true,
     showLightnessSlider: Boolean = true,
     showColorEdit: Boolean = false,
@@ -68,13 +75,41 @@ fun ColorPicker(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Color preview
-        ColorPreviewBox(
-            color = state.value.selectedColor,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-        )
+        // Color Wheel
+        if (showColorWheel) {
+            ColorWheel(
+                wheelType = wheelType,
+                density = density,
+                lightness = state.value.lightness,
+                alpha = state.value.alpha,
+                onColorChange = { newColor ->
+                    state.value = state.value.copy(
+                        selectedColor = newColor
+                    )
+                    scope.launch {
+                        eventHandler.emitColorChanged(
+                            newColor,
+                            state.value.alpha,
+                            state.value.lightness
+                        )
+                    }
+                },
+                onColorSelected = { finalColor ->
+                    scope.launch {
+                        eventHandler.emitColorSelected(finalColor)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else {
+            // Color preview when wheel is hidden
+            ColorPreviewBox(
+                color = state.value.selectedColor,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+            )
+        }
 
         // Lightness Slider
         if (showLightnessSlider) {
@@ -177,6 +212,8 @@ private fun ColorPickerPreview() {
     MaterialTheme {
         ColorPicker(
             initialColor = Color.Blue,
+            wheelType = ColorPickerState.WheelType.FLOWER,
+            showColorWheel = true,
             showAlphaSlider = true,
             showLightnessSlider = true,
             showColorEdit = true
@@ -184,26 +221,42 @@ private fun ColorPickerPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "No Sliders")
+@Preview(showBackground = true, name = "Circle Wheel")
 @Composable
-private fun ColorPickerNoSlidersPreview() {
+private fun ColorPickerCirclePreview() {
     MaterialTheme {
         ColorPicker(
             initialColor = Color.Green,
-            showAlphaSlider = false,
-            showLightnessSlider = false,
+            wheelType = ColorPickerState.WheelType.CIRCLE,
+            showColorWheel = true,
+            showAlphaSlider = true,
+            showLightnessSlider = true
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "No Wheel")
+@Composable
+private fun ColorPickerNoWheelPreview() {
+    MaterialTheme {
+        ColorPicker(
+            initialColor = Color.Red,
+            showColorWheel = false,
+            showAlphaSlider = true,
+            showLightnessSlider = true,
             showColorEdit = true
         )
     }
 }
 
-@Preview(showBackground = true, name = "Alpha Only")
+@Preview(showBackground = true, name = "Minimal")
 @Composable
-private fun ColorPickerAlphaOnlyPreview() {
+private fun ColorPickerMinimalPreview() {
     MaterialTheme {
         ColorPicker(
-            initialColor = Color.Red,
-            showAlphaSlider = true,
+            initialColor = Color.Magenta,
+            showColorWheel = true,
+            showAlphaSlider = false,
             showLightnessSlider = false,
             showColorEdit = false
         )
