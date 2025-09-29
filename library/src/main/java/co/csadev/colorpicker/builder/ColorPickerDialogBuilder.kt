@@ -12,7 +12,12 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
-import co.csadev.colorpicker.*
+import co.csadev.colorpicker.ColorPickerView
+import co.csadev.colorpicker.OnColorChangedListener
+import co.csadev.colorpicker.OnColorSelectedListener
+import co.csadev.colorpicker.R
+import co.csadev.colorpicker.hexString
+import co.csadev.colorpicker.hexStringAlpha
 import co.csadev.colorpicker.slider.AlphaSlider
 import co.csadev.colorpicker.slider.LightnessSlider
 
@@ -45,7 +50,8 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
         pickerContainer.gravity = Gravity.CENTER_HORIZONTAL
         pickerContainer.setPadding(defaultMargin, defaultMarginTop, defaultMargin, 0)
 
-        val layoutParamsForColorPickerView = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0)
+        val layoutParamsForColorPickerView =
+            LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0)
         layoutParamsForColorPickerView.weight = 1f
         colorPickerView = ColorPickerView(context)
 
@@ -99,22 +105,44 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
         return this
     }
 
-    fun setPositiveButton(text: CharSequence, onClickListener: ColorPickerClickListener): ColorPickerDialogBuilder {
-        builder.setPositiveButton(text) { dialog, _ -> positiveButtonOnClick(dialog, onClickListener) }
+    fun setPositiveButton(
+        text: CharSequence,
+        onClickListener: ColorPickerClickListener
+    ): ColorPickerDialogBuilder {
+        builder.setPositiveButton(text) { dialog, _ ->
+            positiveButtonOnClick(
+                dialog,
+                onClickListener
+            )
+        }
         return this
     }
 
-    fun setPositiveButton(textId: Int, onClickListener: ColorPickerClickListener): ColorPickerDialogBuilder {
-        builder.setPositiveButton(textId) { dialog, _ -> positiveButtonOnClick(dialog, onClickListener) }
+    fun setPositiveButton(
+        textId: Int,
+        onClickListener: ColorPickerClickListener
+    ): ColorPickerDialogBuilder {
+        builder.setPositiveButton(textId) { dialog, _ ->
+            positiveButtonOnClick(
+                dialog,
+                onClickListener
+            )
+        }
         return this
     }
 
-    fun setNegativeButton(text: CharSequence, onClickListener: DialogInterface.OnClickListener): ColorPickerDialogBuilder {
+    fun setNegativeButton(
+        text: CharSequence,
+        onClickListener: DialogInterface.OnClickListener
+    ): ColorPickerDialogBuilder {
         builder.setNegativeButton(text, onClickListener)
         return this
     }
 
-    fun setNegativeButton(textId: Int, onClickListener: DialogInterface.OnClickListener): ColorPickerDialogBuilder {
+    fun setNegativeButton(
+        textId: Int,
+        onClickListener: DialogInterface.OnClickListener
+    ): ColorPickerDialogBuilder {
         builder.setNegativeButton(textId, onClickListener)
         return this
     }
@@ -185,7 +213,10 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
         colorPickerView.setShowBorder(isBorderEnabled)
 
         if (isLightnessSliderEnabled) {
-            val layoutParamsForLightnessBar = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getDimensionAsPx(context, R.dimen.default_slider_height))
+            val layoutParamsForLightnessBar = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                getDimensionAsPx(context, R.dimen.default_slider_height)
+            )
             lightnessSlider = LightnessSlider(context)
             lightnessSlider?.layoutParams = layoutParamsForLightnessBar
             pickerContainer.addView(lightnessSlider)
@@ -194,7 +225,10 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
             //lightnessSlider?.setShowBorder(isBorderEnabled) //TODO: What happened here?
         }
         if (isAlphaSliderEnabled) {
-            val layoutParamsForAlphaBar = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getDimensionAsPx(context, R.dimen.default_slider_height))
+            val layoutParamsForAlphaBar = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                getDimensionAsPx(context, R.dimen.default_slider_height)
+            )
             alphaSlider = AlphaSlider(context)
             alphaSlider?.layoutParams = layoutParamsForAlphaBar
             pickerContainer.addView(alphaSlider)
@@ -203,7 +237,10 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
             //alphaSlider?.setShowBorder(isBorderEnabled) //TODO: What happened here?
         }
         if (isColorEditEnabled) {
-            val layoutParamsForColorEdit = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            val layoutParamsForColorEdit = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             colorEdit = (View.inflate(context, R.layout.color_edit, null) as EditText).apply {
                 filters = arrayOf<InputFilter>(InputFilter.AllCaps())
                 setSingleLine()
@@ -232,7 +269,8 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
                 var i = 0
                 while (i < initialColor.size && i < this.pickerCount) {
                     val useColor = initialColor[i] ?: break
-                    val colorLayout = View.inflate(context, R.layout.color_selector, null) as LinearLayout
+                    val colorLayout =
+                        View.inflate(context, R.layout.color_selector, null) as LinearLayout
                     val colorImage = colorLayout.findViewById<View>(R.id.image_preview) as ImageView
                     colorImage.setImageDrawable(ColorDrawable(useColor))
                     colorPreview?.addView(colorLayout)
@@ -261,7 +299,10 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
         return colors[getStartOffset(colors) ?: return Color.WHITE] ?: Color.WHITE
     }
 
-    private fun positiveButtonOnClick(dialog: DialogInterface, onClickListener: ColorPickerClickListener) {
+    private fun positiveButtonOnClick(
+        dialog: DialogInterface,
+        onClickListener: ColorPickerClickListener
+    ) {
         val selectedColor = colorPickerView.selectedColor
         val allColors = colorPickerView.allColors
         onClickListener.onClick(dialog, selectedColor, allColors)

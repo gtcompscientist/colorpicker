@@ -10,11 +10,11 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
@@ -23,7 +23,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 /**
  * A preference item that opens a color picker dialog.
@@ -44,14 +43,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun ColorPickerPreferenceItem(
     title: String,
-    summary: String? = null,
     color: Color,
+    modifier: Modifier = Modifier,
+    summary: String? = null,
     onColorChange: (Color) -> Unit,
     enabled: Boolean = true,
     showAlphaSlider: Boolean = true,
     showLightnessSlider: Boolean = true,
-    showColorEdit: Boolean = false,
-    modifier: Modifier = Modifier
+    showColorEdit: Boolean = false
 ) {
     val dialogState = rememberColorPickerDialogState(initialColor = color)
 
@@ -117,8 +116,8 @@ private fun ColorPickerPreferenceItemPreview() {
     MaterialTheme {
         ColorPickerPreferenceItem(
             title = "Accent Color",
-            summary = "Choose your accent color",
             color = Color.Cyan,
+            summary = "Choose your accent color",
             onColorChange = {}
         )
     }
@@ -130,8 +129,8 @@ private fun ColorPickerPreferenceItemDisabledPreview() {
     MaterialTheme {
         ColorPickerPreferenceItem(
             title = "Theme Color",
-            summary = "This preference is disabled",
             color = Color.Red,
+            summary = "This preference is disabled",
             onColorChange = {},
             enabled = false
         )

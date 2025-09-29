@@ -88,6 +88,7 @@ fun LaunchedColorPickerEventListener(
                     event.alpha,
                     event.lightness
                 )
+
                 is ColorPickerEvent.ColorSelected -> onColorSelected?.invoke(event.finalColor)
             }
         }

@@ -32,6 +32,7 @@ data class ColorPickerState(
     enum class WheelType {
         /** A flower-shaped color wheel with petals */
         FLOWER,
+
         /** A simple circular color wheel */
         CIRCLE
     }

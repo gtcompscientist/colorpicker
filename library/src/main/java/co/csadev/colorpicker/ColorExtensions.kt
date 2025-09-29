@@ -1,7 +1,7 @@
 package co.csadev.colorpicker
 
 import android.graphics.Color
-import java.util.*
+import java.util.Locale
 import kotlin.math.roundToInt
 
 /**

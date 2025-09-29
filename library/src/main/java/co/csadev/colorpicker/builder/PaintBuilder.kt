@@ -1,7 +1,14 @@
 package co.csadev.colorpicker.builder
 
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapShader
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.Shader
 import kotlin.math.roundToInt
+import androidx.core.graphics.createBitmap
 
 object PaintBuilder {
     fun newPaint(): PaintHolder {
@@ -53,12 +60,16 @@ object PaintBuilder {
         var size = size
         size /= 2
         size = 8.coerceAtLeast(size * 2)
-        return BitmapShader(createAlphaBackgroundPattern(size), Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
+        return BitmapShader(
+            createAlphaBackgroundPattern(size),
+            Shader.TileMode.REPEAT,
+            Shader.TileMode.REPEAT
+        )
     }
 
     private fun createAlphaBackgroundPattern(size: Int): Bitmap {
         val alphaPatternPaint = newPaint().build()
-        val bm = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val bm = createBitmap(size, size)
         val c = Canvas(bm)
         val s = (size / 2f).roundToInt()
         for (i in 0..1)
@@ -67,7 +78,13 @@ object PaintBuilder {
                     alphaPatternPaint.color = -0x1
                 else
                     alphaPatternPaint.color = -0x2f2f30
-                c.drawRect((i * s).toFloat(), (j * s).toFloat(), ((i + 1) * s).toFloat(), ((j + 1) * s).toFloat(), alphaPatternPaint)
+                c.drawRect(
+                    (i * s).toFloat(),
+                    (j * s).toFloat(),
+                    ((i + 1) * s).toFloat(),
+                    ((j + 1) * s).toFloat(),
+                    alphaPatternPaint
+                )
             }
         return bm
     }

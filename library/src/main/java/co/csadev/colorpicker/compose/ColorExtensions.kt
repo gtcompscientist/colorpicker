@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import java.util.Locale
 import kotlin.math.roundToInt
+import androidx.core.graphics.toColorInt
 
 /**
  * Converts a Compose Color to an Android Color integer.
@@ -100,8 +101,7 @@ val Color.hexStringWithAlpha: String
  */
 fun String.parseColor(): Color? {
     return try {
-        val colorInt = android.graphics.Color.parseColor(this)
-        Color(colorInt)
+        Color(toColorInt())
     } catch (e: IllegalArgumentException) {
         null
     }

@@ -25,7 +25,8 @@ class AlphaSlider : AbsCustomSlider {
     private val alphaPatternPaint = PaintBuilder.newPaint().build()
     private val barPaint = PaintBuilder.newPaint().build()
     private val solid = PaintBuilder.newPaint().build()
-    private val clearingStroke = PaintBuilder.newPaint().color(-0x1).xPerMode(PorterDuff.Mode.CLEAR).build()
+    private val clearingStroke =
+        PaintBuilder.newPaint().color(-0x1).xPerMode(PorterDuff.Mode.CLEAR).build()
 
     private var clearStroke = PaintBuilder.newPaint().build()
     private var clearBitmap: Bitmap? = null
@@ -34,7 +35,11 @@ class AlphaSlider : AbsCustomSlider {
     var colorPicker: ColorPickerView? = null
 
     @JvmOverloads
-    constructor(context: Context? = null, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : super(context, attrs, defStyleAttr)
+    constructor(
+        context: Context? = null,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+    ) : super(context, attrs, defStyleAttr)
 
     override fun createBitmaps() {
         super.createBitmaps()
@@ -75,8 +80,14 @@ class AlphaSlider : AbsCustomSlider {
             clearBitmapCanvas!!.drawCircle(x, y, handleRadius * 0.75f + 4, alphaPatternPaint)
             clearBitmapCanvas!!.drawCircle(x, y, handleRadius * 0.75f + 4, solid)
 
-            clearStroke = PaintBuilder.newPaint().color(-0x1).style(Paint.Style.STROKE).stroke(6f).xPerMode(PorterDuff.Mode.CLEAR).build()
-            clearBitmapCanvas!!.drawCircle(x, y, handleRadius * 0.75f + clearStroke.strokeWidth / 2, clearStroke)
+            clearStroke = PaintBuilder.newPaint().color(-0x1).style(Paint.Style.STROKE).stroke(6f)
+                .xPerMode(PorterDuff.Mode.CLEAR).build()
+            clearBitmapCanvas!!.drawCircle(
+                x,
+                y,
+                handleRadius * 0.75f + clearStroke.strokeWidth / 2,
+                clearStroke
+            )
             canvas.drawBitmap(clearBitmap!!, 0f, 0f, null)
         } else {
             canvas.drawCircle(x, y, handleRadius * 0.75f, solid)

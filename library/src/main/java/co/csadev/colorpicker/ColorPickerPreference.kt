@@ -30,26 +30,38 @@ class ColorPickerPreference : Preference {
     protected lateinit var colorIndicator: ImageView
 
     @JvmOverloads
-    constructor(context: Context? = null, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : super(context, attrs, defStyleAttr) {
+    constructor(
+        context: Context? = null,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+    ) : super(context, attrs, defStyleAttr) {
         val typedArray = context?.obtainStyledAttributes(attrs, R.styleable.ColorPickerView)
 
         try {
             typedArray?.let { attributes ->
                 alphaSlider = attributes.getBoolean(R.styleable.ColorPickerView_alphaSlider, false)
-                lightSlider = attributes.getBoolean(R.styleable.ColorPickerView_lightnessSlider, false)
+                lightSlider =
+                    attributes.getBoolean(R.styleable.ColorPickerView_lightnessSlider, false)
                 border = attributes.getBoolean(R.styleable.ColorPickerView_border, true)
 
                 density = attributes.getInt(R.styleable.ColorPickerView_density, 8)
-                wheelType = ColorPickerView.WheelType.indexOf(attributes.getInt(R.styleable.ColorPickerView_wheelType, 0))
+                wheelType = ColorPickerView.WheelType.indexOf(
+                    attributes.getInt(
+                        R.styleable.ColorPickerView_wheelType,
+                        0
+                    )
+                )
 
                 selectedColor = attributes.getInt(R.styleable.ColorPickerView_initialColor, -0x1)
 
-                pickerColorEdit = attributes.getBoolean(R.styleable.ColorPickerView_pickerColorEdit, true)
+                pickerColorEdit =
+                    attributes.getBoolean(R.styleable.ColorPickerView_pickerColorEdit, true)
                 pickerTitle = attributes.getString(R.styleable.ColorPickerView_pickerTitle)
                 if (pickerTitle == null)
                     pickerTitle = "Choose color"
 
-                pickerButtonCancel = attributes.getString(R.styleable.ColorPickerView_pickerButtonCancel)
+                pickerButtonCancel =
+                    attributes.getString(R.styleable.ColorPickerView_pickerButtonCancel)
                 if (pickerButtonCancel == null)
                     pickerButtonCancel = "cancel"
 
@@ -101,19 +113,23 @@ class ColorPickerPreference : Preference {
 
     override fun onClick() {
         val builder = ColorPickerDialogBuilder
-                .with(context)
-                .setTitle(pickerTitle!!)
-                .initialColor(selectedColor)
-                .showBorder(border)
-                .wheelType(wheelType)
-                .density(density)
-                .showColorEdit(pickerColorEdit)
-                .setPositiveButton(pickerButtonOk!!, object : ColorPickerClickListener {
-                    override fun onClick(dialog: DialogInterface, selectedColorFromPicker: Int, allColors: Array<Int?>) {
-                        setValue(selectedColorFromPicker)
-                    }
-                })
-                .setNegativeButton(pickerButtonCancel!!, null!!)
+            .with(context)
+            .setTitle(pickerTitle!!)
+            .initialColor(selectedColor)
+            .showBorder(border)
+            .wheelType(wheelType)
+            .density(density)
+            .showColorEdit(pickerColorEdit)
+            .setPositiveButton(pickerButtonOk!!, object : ColorPickerClickListener {
+                override fun onClick(
+                    dialog: DialogInterface,
+                    selectedColorFromPicker: Int,
+                    allColors: Array<Int?>
+                ) {
+                    setValue(selectedColorFromPicker)
+                }
+            })
+            .setNegativeButton(pickerButtonCancel!!, null!!)
 
         if (!alphaSlider && !lightSlider)
             builder.noSliders()
@@ -122,8 +138,8 @@ class ColorPickerPreference : Preference {
         else if (!lightSlider) builder.alphaSliderOnly()
 
         builder
-                .build()
-                .show()
+            .build()
+            .show()
     }
 
     companion object {
@@ -134,10 +150,12 @@ class ColorPickerPreference : Preference {
             val g = Color.green(color)
             val b = Color.blue(color)
 
-            return Color.argb(a,
-                    Math.max((r * factor).toInt(), 0),
-                    Math.max((g * factor).toInt(), 0),
-                    Math.max((b * factor).toInt(), 0))
+            return Color.argb(
+                a,
+                Math.max((r * factor).toInt(), 0),
+                Math.max((g * factor).toInt(), 0),
+                Math.max((b * factor).toInt(), 0)
+            )
         }
     }
 }

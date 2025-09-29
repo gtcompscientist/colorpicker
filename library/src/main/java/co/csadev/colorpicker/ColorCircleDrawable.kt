@@ -8,9 +8,12 @@ import co.csadev.colorpicker.builder.PaintBuilder
 
 class ColorCircleDrawable(color: Int) : ColorDrawable(color) {
     private var strokeWidth: Float = 0.toFloat()
-    private val strokePaint = PaintBuilder.newPaint().style(Paint.Style.STROKE).stroke(strokeWidth).color(-0x616162).build()
+    private val strokePaint =
+        PaintBuilder.newPaint().style(Paint.Style.STROKE).stroke(strokeWidth).color(-0x616162)
+            .build()
     private val fillPaint = PaintBuilder.newPaint().style(Paint.Style.FILL).color(0).build()
-    private val fillBackPaint = PaintBuilder.newPaint().shader(PaintBuilder.createAlphaPatternShader(26)).build()
+    private val fillBackPaint =
+        PaintBuilder.newPaint().shader(PaintBuilder.createAlphaPatternShader(26)).build()
 
     override fun draw(canvas: Canvas) {
         canvas.drawColor(0)

@@ -6,7 +6,7 @@ import co.csadev.colorpicker.renderer.FlowerColorWheelRenderer
 import co.csadev.colorpicker.renderer.SimpleColorWheelRenderer
 
 fun ColorPickerView.WheelType.getRenderer(): ColorWheelRenderer =
-        when (this) {
-            ColorPickerView.WheelType.CIRCLE -> SimpleColorWheelRenderer()
-            ColorPickerView.WheelType.FLOWER -> FlowerColorWheelRenderer()
-        }
+    when (this) {
+        ColorPickerView.WheelType.CIRCLE -> SimpleColorWheelRenderer()
+        ColorPickerView.WheelType.FLOWER -> FlowerColorWheelRenderer()
+    }

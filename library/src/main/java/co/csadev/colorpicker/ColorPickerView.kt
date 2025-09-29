@@ -3,7 +3,11 @@ package co.csadev.colorpicker
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -18,7 +22,6 @@ import co.csadev.colorpicker.renderer.ColorWheelRenderOption
 import co.csadev.colorpicker.renderer.ColorWheelRenderer
 import co.csadev.colorpicker.slider.AlphaSlider
 import co.csadev.colorpicker.slider.LightnessSlider
-import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -82,8 +85,8 @@ class ColorPickerView : View {
 
     var selectedColor: Int
         get() = (currentColorCircle?.color ?: 0)
-                .applyLightness(lightness)
-                .adjustAlpha(alphaValue)
+            .applyLightness(lightness)
+            .adjustAlpha(alphaValue)
         set(value) {
             if (allColors.any { it == null })
                 return
@@ -101,12 +104,21 @@ class ColorPickerView : View {
         initWith(context, attrs)
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initWith(context, attrs)
     }
 
     @TargetApi(21)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
+        context,
+        attrs,
+        defStyleAttr,
+        defStyleRes
+    ) {
         initWith(context, attrs)
     }
 
@@ -116,13 +128,16 @@ class ColorPickerView : View {
         density = typedArray.getInt(R.styleable.ColorPickerView_density, 10)
         initialColor = typedArray.getInt(R.styleable.ColorPickerView_initialColor, -0x1)
 
-        pickerColorEditTextColor = typedArray.getInt(R.styleable.ColorPickerView_pickerColorEditTextColor, -0x1)
+        pickerColorEditTextColor =
+            typedArray.getInt(R.styleable.ColorPickerView_pickerColorEditTextColor, -0x1)
 
-        val wheelType = WheelType.indexOf(typedArray.getInt(R.styleable.ColorPickerView_wheelType, 0))
+        val wheelType =
+            WheelType.indexOf(typedArray.getInt(R.styleable.ColorPickerView_wheelType, 0))
         val renderer = wheelType.getRenderer()
 
         alphaSliderViewId = typedArray.getResourceId(R.styleable.ColorPickerView_alphaSliderView, 0)
-        lightnessSliderViewId = typedArray.getResourceId(R.styleable.ColorPickerView_lightnessSliderView, 0)
+        lightnessSliderViewId =
+            typedArray.getResourceId(R.styleable.ColorPickerView_lightnessSliderView, 0)
 
         setRenderer(renderer)
         setDensity(density)
@@ -237,6 +252,7 @@ class ColorPickerView : View {
                 updateColorWheel()
                 invalidate()
             }
+
             MotionEvent.ACTION_UP -> {
                 val selectedColor = selectedColor
                 listeners.forEach { listener ->
@@ -285,12 +301,23 @@ class ColorPickerView : View {
         currentColorCanvas?.drawCircle(colorCircle.x, colorCircle.y, size + 4, alphaPatternPaint)
         currentColorCanvas?.drawCircle(colorCircle.x, colorCircle.y, size + 4, colorWheelFill)
 
-        selectorStroke = PaintBuilder.newPaint().color(-0x1).style(Paint.Style.STROKE).stroke(size * (STROKE_RATIO - 1)).xPerMode(PorterDuff.Mode.CLEAR).build()
+        selectorStroke = PaintBuilder.newPaint().color(-0x1).style(Paint.Style.STROKE)
+            .stroke(size * (STROKE_RATIO - 1)).xPerMode(PorterDuff.Mode.CLEAR).build()
 
-        if (showBorder) colorWheelCanvas?.drawCircle(colorCircle.x, colorCircle.y, size + selectorStroke.strokeWidth / 2f, selectorStroke)
+        if (showBorder) colorWheelCanvas?.drawCircle(
+            colorCircle.x,
+            colorCircle.y,
+            size + selectorStroke.strokeWidth / 2f,
+            selectorStroke
+        )
         canvas.drawBitmap(wheel, 0f, 0f, null)
 
-        currentColorCanvas?.drawCircle(colorCircle.x, colorCircle.y, size + selectorStroke.strokeWidth / 2f, selectorStroke)
+        currentColorCanvas?.drawCircle(
+            colorCircle.x,
+            colorCircle.y,
+            size + selectorStroke.strokeWidth / 2f,
+            selectorStroke
+        )
         currentColor?.let { canvas.drawBitmap(it, 0f, 0f, null) }
     }
 
@@ -409,7 +436,7 @@ class ColorPickerView : View {
     fun setAlphaSlider(slide: AlphaSlider?) {
         alphaSlider = slide
         alphaSlider?.colorPicker = this
-        alphaSlider?.color =selectedColor
+        alphaSlider?.color = selectedColor
     }
 
     fun setColorEdit(editText: EditText) {

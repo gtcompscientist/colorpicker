@@ -16,12 +16,17 @@ class LightnessSlider : AbsCustomSlider {
     private var color: Int = 0
     private val barPaint = PaintBuilder.newPaint().build()
     private val solid = PaintBuilder.newPaint().build()
-    private val clearingStroke = PaintBuilder.newPaint().color(-0x1).xPerMode(PorterDuff.Mode.CLEAR).build()
+    private val clearingStroke =
+        PaintBuilder.newPaint().color(-0x1).xPerMode(PorterDuff.Mode.CLEAR).build()
 
     var colorPicker: ColorPickerView? = null
 
     @JvmOverloads
-    constructor(context: Context? = null, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : super(context, attrs, defStyleAttr)
+    constructor(
+        context: Context? = null,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+    ) : super(context, attrs, defStyleAttr)
 
     override fun drawBar(barCanvas: Canvas) {
         val width = barCanvas.width

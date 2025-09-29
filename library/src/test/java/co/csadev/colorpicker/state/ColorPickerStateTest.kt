@@ -20,11 +20,17 @@ class ColorPickerStateTest {
     @Test
     fun `ColorPickerState validates lightness range`() {
         assertThrows(IllegalArgumentException::class.java) {
-            ColorPickerState(selectedColor = androidx.compose.ui.graphics.Color.Red, lightness = -0.1f)
+            ColorPickerState(
+                selectedColor = androidx.compose.ui.graphics.Color.Red,
+                lightness = -0.1f
+            )
         }
 
         assertThrows(IllegalArgumentException::class.java) {
-            ColorPickerState(selectedColor = androidx.compose.ui.graphics.Color.Red, lightness = 1.1f)
+            ColorPickerState(
+                selectedColor = androidx.compose.ui.graphics.Color.Red,
+                lightness = 1.1f
+            )
         }
     }
 
@@ -41,7 +47,13 @@ class ColorPickerStateTest {
     @Test
     fun `WheelType enum has correct values`() {
         assertEquals(2, ColorPickerState.WheelType.values().size)
-        assertEquals(ColorPickerState.WheelType.FLOWER, ColorPickerState.WheelType.valueOf("FLOWER"))
-        assertEquals(ColorPickerState.WheelType.CIRCLE, ColorPickerState.WheelType.valueOf("CIRCLE"))
+        assertEquals(
+            ColorPickerState.WheelType.FLOWER,
+            ColorPickerState.WheelType.valueOf("FLOWER")
+        )
+        assertEquals(
+            ColorPickerState.WheelType.CIRCLE,
+            ColorPickerState.WheelType.valueOf("CIRCLE")
+        )
     }
 }

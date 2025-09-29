@@ -2,7 +2,6 @@ package co.csadev.colorpicker.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.csadev.colorpicker.ColorPickerEventHandler
 import co.csadev.colorpicker.LaunchedColorPickerEventListener
-import co.csadev.colorpicker.state.ColorPickerState
 import co.csadev.colorpicker.state.rememberColorPickerState
 import kotlinx.coroutines.launch
 

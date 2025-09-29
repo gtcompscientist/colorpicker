@@ -26,13 +26,19 @@ abstract class AbsCustomSlider : View {
     private var inVerticalOrientation = false
 
     @JvmOverloads
-    constructor(context: Context? = null, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : super(context, attrs, defStyleAttr) {
+    constructor(
+        context: Context? = null,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+    ) : super(context, attrs, defStyleAttr) {
         val styledAttrs = context?.theme?.obtainStyledAttributes(
-                attrs, R.styleable.AbsCustomSlider, 0, 0)
+            attrs, R.styleable.AbsCustomSlider, 0, 0
+        )
         try {
             inVerticalOrientation = styledAttrs?.getBoolean(
-                    R.styleable.AbsCustomSlider_inVerticalOrientation, inVerticalOrientation)
-                    ?: false
+                R.styleable.AbsCustomSlider_inVerticalOrientation, inVerticalOrientation
+            )
+                ?: false
         } finally {
             styledAttrs?.recycle()
         }
@@ -89,7 +95,12 @@ abstract class AbsCustomSlider : View {
 
         bar?.let {
             bitmapCanvas?.drawColor(0, PorterDuff.Mode.CLEAR)
-            bitmapCanvas?.drawBitmap(it, barOffsetX.toFloat(), ((height - it.height) / 2).toFloat(), null)
+            bitmapCanvas?.drawBitmap(
+                it,
+                barOffsetX.toFloat(),
+                ((height - it.height) / 2).toFloat(),
+                null
+            )
         }
         val x = handleRadius + value * (width - handleRadius * 2)
         val y = height / 2f
@@ -143,6 +154,7 @@ abstract class AbsCustomSlider : View {
                     invalidate()
                 }
             }
+
             MotionEvent.ACTION_UP -> {
                 onValueChanged(value)
                 onValueChangedListener?.onValueChanged(value)
