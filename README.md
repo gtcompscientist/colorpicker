@@ -7,9 +7,9 @@ Color Picker
 
 simple android color picker with color wheel and lightness bar.
 
-[<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Get_it_on_Google_play.svg/800px-Get_it_on_Google_play.svg.png" width="150px">](https://play.google.com/store/apps/details?id=com.flask.colorpicker.sample)
+[<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Get_it_on_Google_play.svg/800px-Get_it_on_Google_play.svg.png" width="150px">](https://play.google.com/store/apps/details?id=co.csadev.colorpicker.sample)
 
-[market link](https://play.google.com/store/apps/details?id=com.flask.colorpicker.sample)
+[market link](https://play.google.com/store/apps/details?id=co.csadev.colorpicker.sample)
 
 ## Demo video
 
@@ -90,7 +90,7 @@ ColorPickerDialogBuilder
 ```
 As a widget
 ```xml
-	<com.flask.colorpicker.ColorPickerView
+	<co.csadev.colorpicker.ColorPickerView
 		android:id="@+id/color_picker_view"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -102,13 +102,13 @@ As a widget
 	    app:alphaSliderView="@+id/v_alpha_slider"
 		/>
 
-	<com.flask.colorpicker.slider.LightnessSlider
+	<co.csadev.colorpicker.slider.LightnessSlider
 		android:id="@+id/v_lightness_slider"
 		android:layout_width="match_parent"
 		android:layout_height="48dp"
 		/>
 
-	<com.flask.colorpicker.slider.AlphaSlider
+	<co.csadev.colorpicker.slider.AlphaSlider
 		android:id="@+id/v_alpha_slider"
 		android:layout_width="match_parent"
 		android:layout_height="48dp"
