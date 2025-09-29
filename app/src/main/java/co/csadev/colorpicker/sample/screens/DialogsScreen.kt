@@ -23,10 +23,13 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,11 +43,39 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.csadev.colorpicker.compose.ColorPickerDialog
 import co.csadev.colorpicker.compose.hexStringWithAlpha
+import co.csadev.colorpicker.sample.ViewCodeButton
 import co.csadev.colorpicker.state.ColorPickerState
+
+private const val SOURCE_CODE = """
+@Composable
+fun DialogExample() {
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedColor by remember { mutableStateOf(Color.Green) }
+
+    Button(onClick = { showDialog = true }) {
+        Text("Pick Color")
+    }
+
+    if (showDialog) {
+        ColorPickerDialog(
+            onDismissRequest = { showDialog = false },
+            onColorSelected = { color ->
+                selectedColor = color
+                showDialog = false
+            },
+            initialColor = selectedColor,
+            title = "Choose a Color",
+            confirmText = "Select",
+            dismissText = "Cancel"
+        )
+    }
+}
+"""
 
 /**
  * Demonstrates color picker dialogs with different configurations.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialogsScreen() {
     var color1 by remember { mutableStateOf(Color(0xFFE91E63)) }
@@ -55,14 +86,28 @@ fun DialogsScreen() {
     var showDialog2 by remember { mutableStateOf(false) }
     var showDialog3 by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Header
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Color Picker Dialogs") },
+                actions = {
+                    ViewCodeButton(
+                        code = SOURCE_CODE,
+                        docsAnchor = "color-picker-dialog"
+                    )
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Header
         Text(
             text = "Color Picker Dialogs",
             style = MaterialTheme.typography.headlineMedium,
@@ -140,6 +185,7 @@ fun DialogsScreen() {
             showLightnessSlider = false,
             showColorEdit = false
         )
+    }
     }
 }
 

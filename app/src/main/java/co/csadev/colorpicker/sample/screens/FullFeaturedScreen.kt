@@ -16,8 +16,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,27 +30,68 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.csadev.colorpicker.compose.ColorPicker
 import co.csadev.colorpicker.compose.hexStringWithAlpha
+import co.csadev.colorpicker.sample.ViewCodeButton
 import co.csadev.colorpicker.state.ColorPickerState
+
+private const val SOURCE_CODE = """
+@Composable
+fun FullFeaturedColorPicker() {
+    var selectedColor by remember { mutableStateOf(Color(0xFF2196F3)) }
+
+    ColorPicker(
+        initialColor = selectedColor,
+        wheelType = ColorPickerState.WheelType.FLOWER,
+        density = 10,
+        showColorWheel = true,
+        showAlphaSlider = true,
+        showLightnessSlider = true,
+        showColorEdit = true,
+        onColorChanged = { color ->
+            println("Color changing: ${'$'}{color.hexStringWithAlpha}")
+        },
+        onColorSelected = { color ->
+            selectedColor = color
+        }
+    )
+}
+"""
 
 /**
  * Demonstrates the full-featured color picker with all options.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullFeaturedScreen() {
     var selectedColor by remember { mutableStateOf(Color(0xFF2196F3)) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Header
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Full Featured") },
+                actions = {
+                    ViewCodeButton(
+                        code = SOURCE_CODE,
+                        docsAnchor = "simple-color-picker"
+                    )
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Header
         Text(
             text = "Full Featured Color Picker",
             style = MaterialTheme.typography.headlineMedium,
@@ -118,6 +162,7 @@ fun FullFeaturedScreen() {
             )
         }
     }
+    }
 }
 
 @Composable
@@ -137,11 +182,4 @@ private fun ColorInfo(label: String, value: Int) {
             color = if (value > 127) Color.Black else Color.White
         )
     }
-}
-
-/**
- * Extension function to calculate luminance for determining text color.
- */
-private fun Color.luminance(): Float {
-    return (0.299f * red + 0.587f * green + 0.114f * blue)
 }

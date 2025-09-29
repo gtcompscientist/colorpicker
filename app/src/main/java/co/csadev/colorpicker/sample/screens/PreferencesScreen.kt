@@ -14,9 +14,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,13 +35,41 @@ import androidx.datastore.preferences.preferencesDataStore
 import co.csadev.colorpicker.compose.ColorPickerPreferenceItem
 import co.csadev.colorpicker.compose.getColorFlow
 import co.csadev.colorpicker.compose.saveColor
+import co.csadev.colorpicker.sample.ViewCodeButton
 import kotlinx.coroutines.launch
 
 val Context.dataStore by preferencesDataStore(name = "color_preferences")
 
+private const val SOURCE_CODE = """
+@Composable
+fun PreferencesExample() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val primaryColor by context.dataStore.getColorFlow(
+        key = "primary_color",
+        defaultColor = Color(0xFF6200EE)
+    ).collectAsState(initial = Color(0xFF6200EE))
+
+    ColorPickerPreferenceItem(
+        title = "Primary Color",
+        color = primaryColor,
+        summary = "Main theme color",
+        onColorChange = { color ->
+            scope.launch {
+                context.dataStore.saveColor("primary_color", color)
+            }
+        },
+        showAlphaSlider = false,
+        showLightnessSlider = true
+    )
+}
+"""
+
 /**
  * Demonstrates DataStore preference integration.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreferencesScreen() {
     val context = LocalContext.current
@@ -64,14 +95,28 @@ fun PreferencesScreen() {
         defaultColor = Color(0xFFFAFAFA)
     ).collectAsState(initial = Color(0xFFFAFAFA))
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Header
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Theme Preferences") },
+                actions = {
+                    ViewCodeButton(
+                        code = SOURCE_CODE,
+                        docsAnchor = "datastore-preferences"
+                    )
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Header
         Text(
             text = "Theme Preferences",
             style = MaterialTheme.typography.headlineMedium,
@@ -226,5 +271,6 @@ fun PreferencesScreen() {
                 )
             }
         }
+    }
     }
 }

@@ -35,7 +35,7 @@ Minimum Requirements:
 
 ## Quick Start
 
-### Simplest Example
+### Simplest Example {#simplest-example}
 
 ```kotlin
 import androidx.compose.runtime.*
@@ -57,7 +57,7 @@ fun MyScreen() {
 
 ## Basic Usage
 
-### Simple Color Picker
+### Simple Color Picker {#simple-color-picker}
 
 The `ColorPicker` composable provides a complete color picking interface with sliders:
 
@@ -84,7 +84,7 @@ fun ColorPickerExample() {
 }
 ```
 
-### Color Picker Dialog
+### Color Picker Dialog {#color-picker-dialog}
 
 Show a color picker in a Material3 dialog:
 
@@ -141,7 +141,7 @@ fun DialogStateExample() {
 }
 ```
 
-### Color Sliders
+### Color Sliders {#color-sliders}
 
 Use individual sliders separately:
 
@@ -203,7 +203,7 @@ fun CustomConfigExample() {
 }
 ```
 
-### Event Handling
+### Event Handling {#event-handling}
 
 React to color changes in real-time:
 
@@ -286,7 +286,7 @@ fun Color.Companion.Random() = Color(
 
 ## Preferences Integration
 
-### Using DataStore
+### Using DataStore {#datastore-preferences}
 
 Integrate with Jetpack DataStore for persistent color preferences:
 
