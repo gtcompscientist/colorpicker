@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import co.csadev.colorpicker.compose.ColorPicker
 import co.csadev.colorpicker.compose.hexStringWithAlpha
 import co.csadev.colorpicker.sample.ViewCodeButton
+import co.csadev.colorpicker.sample.WheelTypeSelector
 import co.csadev.colorpicker.state.ColorPickerState
 
 private const val SOURCE_CODE = """
@@ -69,6 +70,7 @@ fun FullFeaturedColorPicker() {
 @Composable
 fun FullFeaturedScreen() {
     var selectedColor by remember { mutableStateOf(Color(0xFF2196F3)) }
+    var wheelType by remember { mutableStateOf(ColorPickerState.WheelType.FLOWER) }
 
     Scaffold(
         topBar = {
@@ -96,6 +98,11 @@ fun FullFeaturedScreen() {
             text = "Full Featured Color Picker",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
+        )
+
+        WheelTypeSelector(
+            wheelType = wheelType,
+            onWheelTypeChange = { wheelType = it }
         )
 
         Text(
@@ -150,7 +157,7 @@ fun FullFeaturedScreen() {
             ColorPicker(
                 modifier = Modifier.padding(16.dp),
                 initialColor = selectedColor,
-                wheelType = ColorPickerState.WheelType.FLOWER,
+                wheelType = wheelType,
                 density = 10,
                 showColorWheel = true,
                 showAlphaSlider = true,

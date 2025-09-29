@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.csadev.colorpicker.compose.ColorPicker
 import co.csadev.colorpicker.sample.ViewCodeButton
+import co.csadev.colorpicker.sample.WheelTypeSelector
+import co.csadev.colorpicker.state.ColorPickerState
 
 private const val SOURCE_CODE = """
 @Composable
@@ -41,6 +43,7 @@ fun MyScreen() {
 @Composable
 fun SimplestExampleScreen() {
     var selectedColor by remember { mutableStateOf(Color.Blue) }
+    var wheelType by remember { mutableStateOf(ColorPickerState.WheelType.FLOWER) }
 
     Scaffold(
         topBar = {
@@ -75,8 +78,14 @@ fun SimplestExampleScreen() {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+            WheelTypeSelector(
+                wheelType = wheelType,
+                onWheelTypeChange = { wheelType = it }
+            )
+
             ColorPicker(
                 initialColor = selectedColor,
+                wheelType = wheelType,
                 onColorSelected = { color ->
                     selectedColor = color
                 }

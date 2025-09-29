@@ -40,9 +40,11 @@ fun LightnessSlider(
     Canvas(
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .height(24.dp)
     ) {
-        val cornerRadius = 8.dp.toPx()
+        val trackHeight = 8.dp.toPx()
+        val cornerRadius = 4.dp.toPx()
+        val trackTop = (size.height - trackHeight) / 2
 
         // Draw gradient background
         val gradient = Brush.horizontalGradient(
@@ -57,17 +59,18 @@ fun LightnessSlider(
         drawRoundRect(
             brush = gradient,
             cornerRadius = CornerRadius(cornerRadius),
-            size = size
+            topLeft = Offset(0f, trackTop),
+            size = Size(size.width, trackHeight)
         )
 
         // Draw current position indicator
         val indicatorX = size.width * lightness
         val indicatorY = size.height / 2
 
-        // Draw outer circle (border)
+        // Draw outer circle (white border)
         drawCircle(
             color = Color.White,
-            radius = 12.dp.toPx(),
+            radius = 10.dp.toPx(),
             center = Offset(indicatorX, indicatorY),
             style = Stroke(width = 2.dp.toPx())
         )
@@ -75,7 +78,7 @@ fun LightnessSlider(
         // Draw inner circle with current lightness color
         drawCircle(
             color = hsv.copy(value = lightness).toColor(color.alpha),
-            radius = 10.dp.toPx(),
+            radius = 8.dp.toPx(),
             center = Offset(indicatorX, indicatorY)
         )
     }
@@ -85,7 +88,7 @@ fun LightnessSlider(
         onValueChange = onLightnessChange,
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
+            .height(24.dp),
         enabled = enabled,
         colors = SliderDefaults.colors(
             thumbColor = Color.Transparent,
@@ -118,12 +121,19 @@ fun AlphaSlider(
     Canvas(
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .height(24.dp)
     ) {
-        val cornerRadius = 8.dp.toPx()
+        val trackHeight = 8.dp.toPx()
+        val cornerRadius = 4.dp.toPx()
+        val trackTop = (size.height - trackHeight) / 2
 
         // Draw checkerboard pattern for transparency visualization
-        drawCheckerboard(checkerSize = 8.dp.toPx(), cornerRadius = cornerRadius)
+        drawCheckerboard(
+            checkerSize = 4.dp.toPx(),
+            cornerRadius = cornerRadius,
+            topLeft = Offset(0f, trackTop),
+            size = Size(size.width, trackHeight)
+        )
 
         // Draw gradient background with alpha
         val gradient = Brush.horizontalGradient(
@@ -137,17 +147,18 @@ fun AlphaSlider(
         drawRoundRect(
             brush = gradient,
             cornerRadius = CornerRadius(cornerRadius),
-            size = size
+            topLeft = Offset(0f, trackTop),
+            size = Size(size.width, trackHeight)
         )
 
         // Draw current position indicator
         val indicatorX = size.width * alpha
         val indicatorY = size.height / 2
 
-        // Draw outer circle (border)
+        // Draw outer circle (white border)
         drawCircle(
             color = Color.White,
-            radius = 12.dp.toPx(),
+            radius = 10.dp.toPx(),
             center = Offset(indicatorX, indicatorY),
             style = Stroke(width = 2.dp.toPx())
         )
@@ -155,7 +166,7 @@ fun AlphaSlider(
         // Draw inner circle with current alpha color
         drawCircle(
             color = color.copy(alpha = alpha),
-            radius = 10.dp.toPx(),
+            radius = 8.dp.toPx(),
             center = Offset(indicatorX, indicatorY)
         )
     }
@@ -165,7 +176,7 @@ fun AlphaSlider(
         onValueChange = onAlphaChange,
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
+            .height(24.dp),
         enabled = enabled,
         colors = SliderDefaults.colors(
             thumbColor = Color.Transparent,
@@ -183,7 +194,9 @@ fun AlphaSlider(
  */
 private fun DrawScope.drawCheckerboard(
     checkerSize: Float,
-    cornerRadius: Float = 0f
+    cornerRadius: Float = 0f,
+    topLeft: Offset = Offset.Zero,
+    size: Size = this.size
 ) {
     val cols = (size.width / checkerSize).roundToInt() + 1
     val rows = (size.height / checkerSize).roundToInt() + 1
@@ -191,8 +204,8 @@ private fun DrawScope.drawCheckerboard(
     for (row in 0 until rows) {
         for (col in 0 until cols) {
             if ((row + col) % 2 == 0) {
-                val x = col * checkerSize
-                val y = row * checkerSize
+                val x = topLeft.x + col * checkerSize
+                val y = topLeft.y + row * checkerSize
 
                 drawRect(
                     color = Color.LightGray.copy(alpha = 0.3f),

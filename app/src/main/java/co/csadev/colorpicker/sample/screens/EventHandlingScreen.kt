@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import co.csadev.colorpicker.compose.ColorPicker
 import co.csadev.colorpicker.compose.hexStringWithAlpha
 import co.csadev.colorpicker.sample.ViewCodeButton
+import co.csadev.colorpicker.sample.WheelTypeSelector
+import co.csadev.colorpicker.state.ColorPickerState
 
 private const val SOURCE_CODE = """
 @Composable
@@ -78,6 +80,7 @@ fun EventHandlingExample() {
 fun EventHandlingScreen() {
     var currentColor by remember { mutableStateOf(Color.Yellow) }
     var previewColor by remember { mutableStateOf(Color.Yellow) }
+    var wheelType by remember { mutableStateOf(ColorPickerState.WheelType.FLOWER) }
 
     Scaffold(
         topBar = {
@@ -110,6 +113,11 @@ fun EventHandlingScreen() {
                 text = "Demonstrates onColorChanged (while dragging) vs onColorSelected (on release).",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            WheelTypeSelector(
+                wheelType = wheelType,
+                onWheelTypeChange = { wheelType = it }
             )
 
             // Live preview while dragging
@@ -176,6 +184,7 @@ fun EventHandlingScreen() {
 
             ColorPicker(
                 initialColor = currentColor,
+                wheelType = wheelType,
                 onColorChanged = { color ->
                     // Update preview while dragging
                     previewColor = color
