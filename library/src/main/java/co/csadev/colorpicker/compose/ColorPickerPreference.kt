@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.map
  * @param showLightnessSlider Whether to show lightness slider in the dialog
  * @param showColorEdit Whether to show hex color input in the dialog
  * @param modifier The modifier to apply to this composable
+ * @param content Optional theme wrapper - defaults to MaterialTheme
  */
 @Composable
 fun ColorPickerPreferenceItem(
@@ -50,7 +51,10 @@ fun ColorPickerPreferenceItem(
     enabled: Boolean = true,
     showAlphaSlider: Boolean = true,
     showLightnessSlider: Boolean = true,
-    showColorEdit: Boolean = false
+    showColorEdit: Boolean = false,
+    content: @Composable (@Composable () -> Unit) -> Unit = { innerContent ->
+        MaterialTheme { innerContent() }
+    }
 ) {
     val dialogState = rememberColorPickerDialogState(initialColor = color)
 
@@ -77,7 +81,8 @@ fun ColorPickerPreferenceItem(
         title = title,
         showAlphaSlider = showAlphaSlider,
         showLightnessSlider = showLightnessSlider,
-        showColorEdit = showColorEdit
+        showColorEdit = showColorEdit,
+        content = content
     )
 }
 

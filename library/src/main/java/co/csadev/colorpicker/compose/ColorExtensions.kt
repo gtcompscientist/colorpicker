@@ -2,9 +2,9 @@ package co.csadev.colorpicker.compose
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.toColorInt
 import java.util.Locale
 import kotlin.math.roundToInt
-import androidx.core.graphics.toColorInt
 
 /**
  * Converts a Compose Color to an Android Color integer.

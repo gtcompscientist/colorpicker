@@ -282,19 +282,20 @@ fun ColorPickerDialogExample() {
 
 ## Comparison: Flower vs Circle
 
-| Feature | Flower Wheel | Circle Wheel |
-|---------|--------------|--------------|
-| **Appearance** | Organic, petal-like | Clean, uniform |
-| **Performance** | Slightly slower | Faster |
-| **Visual Appeal** | More decorative | More precise |
-| **Best For** | Creative apps | Professional tools |
-| **Circle Sizes** | Varies by ring | Uniform |
+| Feature           | Flower Wheel        | Circle Wheel       |
+|-------------------|---------------------|--------------------|
+| **Appearance**    | Organic, petal-like | Clean, uniform     |
+| **Performance**   | Slightly slower     | Faster             |
+| **Visual Appeal** | More decorative     | More precise       |
+| **Best For**      | Creative apps       | Professional tools |
+| **Circle Sizes**  | Varies by ring      | Uniform            |
 
 ## Migration from View-Based
 
 If you're migrating from the old View-based color picker:
 
 ### Before (View)
+
 ```kotlin
 val colorPickerView = ColorPickerView(context)
 colorPickerView.setRenderer(FlowerColorWheelRenderer())
@@ -302,6 +303,7 @@ colorPickerView.density = 10
 ```
 
 ### After (Compose)
+
 ```kotlin
 ColorWheel(
     wheelType = ColorPickerState.WheelType.FLOWER,
@@ -346,6 +348,7 @@ ColorWheel(
 ## Examples
 
 See the sample app for complete examples:
+
 - Basic color wheel usage
 - Integrated with sliders
 - In dialogs

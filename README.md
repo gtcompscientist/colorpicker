@@ -15,15 +15,15 @@ simple android color picker with color wheel and lightness bar.
 
 [Youtube](https://youtu.be/MwWi9X7eqNI)
 
-
 ## Screenshot
 
 ### WHEEL_TYPE.FLOWER
+
 ![screenshot3.png](https://github.com/QuadFlask/colorpicker/blob/master/screenshot/screenshot3.png)
 
 ### WHEEL_TYPE.CIRCLE
-![screenshot.png](https://github.com/QuadFlask/colorpicker/blob/master/screenshot/screenshot.png)
 
+![screenshot.png](https://github.com/QuadFlask/colorpicker/blob/master/screenshot/screenshot.png)
 
 ## How to add dependency?
 
@@ -60,7 +60,9 @@ dependencies {
 > check out latest version at [releases](https://github.com/QuadFlask/colorpicker/releases)
 
 ## Usage
+
 As a dialog
+
 ```java
 ColorPickerDialogBuilder
 	.with(context)
@@ -88,7 +90,9 @@ ColorPickerDialogBuilder
 	.build()
 	.show();
 ```
+
 As a widget
+
 ```xml
 	<co.csadev.colorpicker.ColorPickerView
 		android:id="@+id/color_picker_view"
@@ -115,13 +119,11 @@ As a widget
 		/>
 ```
 
-
 ## To do
 
 * gradle support
 * performance improvement
 * refactoring
-
 
 ## License
 

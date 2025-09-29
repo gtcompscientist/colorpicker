@@ -7,8 +7,8 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Shader
-import kotlin.math.roundToInt
 import androidx.core.graphics.createBitmap
+import kotlin.math.roundToInt
 
 object PaintBuilder {
     fun newPaint(): PaintHolder {

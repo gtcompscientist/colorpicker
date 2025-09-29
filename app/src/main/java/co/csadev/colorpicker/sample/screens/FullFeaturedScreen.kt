@@ -1,8 +1,6 @@
 package co.csadev.colorpicker.sample.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,9 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,10 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.csadev.colorpicker.compose.ColorPicker
@@ -94,81 +88,81 @@ fun FullFeaturedScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Header
-        Text(
-            text = "Full Featured Color Picker",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+            Text(
+                text = "Full Featured Color Picker",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
 
-        WheelTypeSelector(
-            wheelType = wheelType,
-            onWheelTypeChange = { wheelType = it }
-        )
+            WheelTypeSelector(
+                wheelType = wheelType,
+                onWheelTypeChange = { wheelType = it }
+            )
 
-        Text(
-            text = "Interactive color wheel with all controls enabled",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+            Text(
+                text = "Interactive color wheel with all controls enabled",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
-        // Color Preview Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = selectedColor
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            // Color Preview Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = selectedColor
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Text(
-                    text = "Selected Color",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = if (selectedColor.luminance() > 0.5f) Color.Black else Color.White
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = selectedColor.hexStringWithAlpha,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = if (selectedColor.luminance() > 0.5f) Color.Black else Color.White
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ColorInfo("R", (selectedColor.red * 255).toInt())
-                    ColorInfo("G", (selectedColor.green * 255).toInt())
-                    ColorInfo("B", (selectedColor.blue * 255).toInt())
-                    ColorInfo("A", (selectedColor.alpha * 255).toInt())
+                    Text(
+                        text = "Selected Color",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (selectedColor.luminance() > 0.5f) Color.Black else Color.White
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = selectedColor.hexStringWithAlpha,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = if (selectedColor.luminance() > 0.5f) Color.Black else Color.White
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        ColorInfo("R", (selectedColor.red * 255).toInt())
+                        ColorInfo("G", (selectedColor.green * 255).toInt())
+                        ColorInfo("B", (selectedColor.blue * 255).toInt())
+                        ColorInfo("A", (selectedColor.alpha * 255).toInt())
+                    }
                 }
             }
-        }
 
-        // Color Picker
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            ColorPicker(
-                modifier = Modifier.padding(16.dp),
-                initialColor = selectedColor,
-                wheelType = wheelType,
-                density = 10,
-                showColorWheel = true,
-                showAlphaSlider = true,
-                showLightnessSlider = true,
-                showColorEdit = true,
-                onColorSelected = { color ->
-                    selectedColor = color
-                }
-            )
+            // Color Picker
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                ColorPicker(
+                    modifier = Modifier.padding(16.dp),
+                    initialColor = selectedColor,
+                    wheelType = wheelType,
+                    density = 10,
+                    showColorWheel = true,
+                    showAlphaSlider = true,
+                    showLightnessSlider = true,
+                    showColorEdit = true,
+                    onColorSelected = { color ->
+                        selectedColor = color
+                    }
+                )
+            }
         }
-    }
     }
 }
 

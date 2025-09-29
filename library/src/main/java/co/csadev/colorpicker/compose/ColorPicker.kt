@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
  * @param showColorEdit Whether to show the hex color input field
  * @param onColorChanged Callback invoked when the color changes during interaction
  * @param onColorSelected Callback invoked when a color is finalized
+ * @param content Optional theme wrapper - defaults to MaterialTheme
  */
 @Composable
 fun ColorPicker(
@@ -51,7 +52,10 @@ fun ColorPicker(
     showLightnessSlider: Boolean = true,
     showColorEdit: Boolean = false,
     onColorChanged: ((Color) -> Unit)? = null,
-    onColorSelected: ((Color) -> Unit)? = null
+    onColorSelected: ((Color) -> Unit)? = null,
+    content: @Composable (@Composable () -> Unit) -> Unit = { innerContent ->
+        MaterialTheme { innerContent() }
+    }
 ) {
     val state = rememberColorPickerState(
         initialColor = initialColor,
@@ -71,6 +75,35 @@ fun ColorPicker(
         onColorSelected = onColorSelected
     )
 
+    content {
+        ColorPickerContent(
+            modifier = modifier,
+            state = state,
+            eventHandler = eventHandler,
+            scope = scope,
+            wheelType = wheelType,
+            density = density,
+            showColorWheel = showColorWheel,
+            showAlphaSlider = showAlphaSlider,
+            showLightnessSlider = showLightnessSlider,
+            showColorEdit = showColorEdit
+        )
+    }
+}
+
+@Composable
+private fun ColorPickerContent(
+    modifier: Modifier,
+    state: androidx.compose.runtime.MutableState<ColorPickerState>,
+    eventHandler: ColorPickerEventHandler,
+    scope: kotlinx.coroutines.CoroutineScope,
+    wheelType: ColorPickerState.WheelType,
+    density: Int,
+    showColorWheel: Boolean,
+    showAlphaSlider: Boolean,
+    showLightnessSlider: Boolean,
+    showColorEdit: Boolean
+) {
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)

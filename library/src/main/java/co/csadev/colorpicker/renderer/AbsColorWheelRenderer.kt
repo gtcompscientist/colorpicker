@@ -2,7 +2,6 @@ package co.csadev.colorpicker.renderer
 
 import co.csadev.colorpicker.ColorCircle
 import kotlin.math.PI
-import kotlin.math.asin
 import kotlin.math.roundToInt
 
 /**

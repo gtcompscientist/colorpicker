@@ -85,138 +85,138 @@ fun ComparisonScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Header
-        Text(
-            text = "Wheel Type Comparison",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+            Text(
+                text = "Wheel Type Comparison",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
 
-        Text(
-            text = "Compare the Flower and Circle wheel styles",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+            Text(
+                text = "Compare the Flower and Circle wheel styles",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
-        // Flower Wheel
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            // Flower Wheel
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Text(
-                    text = "Flower Wheel",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Organic petal-like appearance with varying circle sizes",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                ColorWheel(
-                    wheelType = ColorPickerState.WheelType.FLOWER,
-                    density = 10,
-                    lightness = 1f,
-                    alpha = 1f,
-                    onColorSelected = { color ->
-                        flowerColor = color
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "Best for: Creative applications, artistic tools",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Flower Wheel",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Organic petal-like appearance with varying circle sizes",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    ColorWheel(
+                        wheelType = ColorPickerState.WheelType.FLOWER,
+                        density = 10,
+                        lightness = 1f,
+                        alpha = 1f,
+                        onColorSelected = { color ->
+                            flowerColor = color
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        text = "Best for: Creative applications, artistic tools",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            // Circle Wheel
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Circle Wheel",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Clean uniform circles for precise color selection",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    ColorWheel(
+                        wheelType = ColorPickerState.WheelType.CIRCLE,
+                        density = 12,
+                        lightness = 1f,
+                        alpha = 1f,
+                        onColorSelected = { color ->
+                            circleColor = color
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        text = "Best for: Professional tools, precise control",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            // Density Comparison
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Low Density (Faster)",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    ColorWheel(
+                        wheelType = ColorPickerState.WheelType.CIRCLE,
+                        density = 6,
+                        lightness = 1f,
+                        alpha = 1f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "High Density (More Detail)",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    ColorWheel(
+                        wheelType = ColorPickerState.WheelType.CIRCLE,
+                        density = 15,
+                        lightness = 1f,
+                        alpha = 1f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
-
-        // Circle Wheel
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Circle Wheel",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Clean uniform circles for precise color selection",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                ColorWheel(
-                    wheelType = ColorPickerState.WheelType.CIRCLE,
-                    density = 12,
-                    lightness = 1f,
-                    alpha = 1f,
-                    onColorSelected = { color ->
-                        circleColor = color
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "Best for: Professional tools, precise control",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-
-        // Density Comparison
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Low Density (Faster)",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                ColorWheel(
-                    wheelType = ColorPickerState.WheelType.CIRCLE,
-                    density = 6,
-                    lightness = 1f,
-                    alpha = 1f,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "High Density (More Detail)",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                ColorWheel(
-                    wheelType = ColorPickerState.WheelType.CIRCLE,
-                    density = 15,
-                    lightness = 1f,
-                    alpha = 1f,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-    }
     }
 }

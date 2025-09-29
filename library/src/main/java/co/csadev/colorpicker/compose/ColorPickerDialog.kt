@@ -29,6 +29,7 @@ import co.csadev.colorpicker.state.rememberColorPickerState
  * @param showAlphaSlider Whether to show the alpha slider
  * @param showLightnessSlider Whether to show the lightness slider
  * @param showColorEdit Whether to show the hex color input
+ * @param content Optional theme wrapper - defaults to MaterialTheme
  */
 @Composable
 fun ColorPickerDialog(
@@ -42,41 +43,47 @@ fun ColorPickerDialog(
     showAlphaSlider: Boolean = true,
     showLightnessSlider: Boolean = true,
     showColorEdit: Boolean = false,
-    properties: DialogProperties = DialogProperties()
+    properties: DialogProperties = DialogProperties(),
+    content: @Composable (@Composable () -> Unit) -> Unit = { innerContent ->
+        MaterialTheme { innerContent() }
+    }
 ) {
     val state = rememberColorPickerState(initialColor = initialColor)
 
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(title) },
-        text = {
-            ColorPicker(
-                modifier = Modifier.fillMaxWidth(),
-                initialColor = initialColor,
-                wheelType = wheelType,
-                showAlphaSlider = showAlphaSlider,
-                showLightnessSlider = showLightnessSlider,
-                showColorEdit = showColorEdit,
-                onColorChanged = { newColor ->
-                    state.value = state.value.copy(selectedColor = newColor)
+    content {
+        AlertDialog(
+            onDismissRequest = onDismissRequest,
+            title = { Text(title) },
+            text = {
+                ColorPicker(
+                    modifier = Modifier.fillMaxWidth(),
+                    initialColor = initialColor,
+                    wheelType = wheelType,
+                    showAlphaSlider = showAlphaSlider,
+                    showLightnessSlider = showLightnessSlider,
+                    showColorEdit = showColorEdit,
+                    onColorChanged = { newColor ->
+                        state.value = state.value.copy(selectedColor = newColor)
+                    },
+                    content = { it() } // Pass through theme from parent
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onColorSelected(state.value.selectedColor)
+                    onDismissRequest()
+                }) {
+                    Text(confirmText)
                 }
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                onColorSelected(state.value.selectedColor)
-                onDismissRequest()
-            }) {
-                Text(confirmText)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(dismissText)
-            }
-        },
-        properties = properties
-    )
+            },
+            dismissButton = {
+                TextButton(onClick = onDismissRequest) {
+                    Text(dismissText)
+                }
+            },
+            properties = properties
+        )
+    }
 }
 
 /**
@@ -128,6 +135,7 @@ fun rememberColorPickerDialogState(
  * @param showAlphaSlider Whether to show alpha slider
  * @param showLightnessSlider Whether to show lightness slider
  * @param showColorEdit Whether to show hex color input
+ * @param content Optional theme wrapper - defaults to MaterialTheme
  */
 @Composable
 fun ColorPickerDialogHost(
@@ -138,7 +146,10 @@ fun ColorPickerDialogHost(
     dismissText: String = "Cancel",
     showAlphaSlider: Boolean = true,
     showLightnessSlider: Boolean = true,
-    showColorEdit: Boolean = false
+    showColorEdit: Boolean = false,
+    content: @Composable (@Composable () -> Unit) -> Unit = { innerContent ->
+        MaterialTheme { innerContent() }
+    }
 ) {
     if (state.isShowing) {
         ColorPickerDialog(
@@ -153,7 +164,8 @@ fun ColorPickerDialogHost(
             dismissText = dismissText,
             showAlphaSlider = showAlphaSlider,
             showLightnessSlider = showLightnessSlider,
-            showColorEdit = showColorEdit
+            showColorEdit = showColorEdit,
+            content = content
         )
     }
 }

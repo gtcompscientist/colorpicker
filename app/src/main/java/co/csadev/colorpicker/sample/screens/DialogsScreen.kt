@@ -16,12 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -108,84 +105,84 @@ fun DialogsScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Header
-        Text(
-            text = "Color Picker Dialogs",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+            Text(
+                text = "Color Picker Dialogs",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
 
-        Text(
-            text = "Different dialog configurations for various use cases",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+            Text(
+                text = "Different dialog configurations for various use cases",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
-        // Dialog 1: Full Featured
-        DialogDemoCard(
-            title = "Full Featured Dialog",
-            description = "Flower wheel with all controls",
-            color = color1,
-            onClick = { showDialog1 = true }
-        )
+            // Dialog 1: Full Featured
+            DialogDemoCard(
+                title = "Full Featured Dialog",
+                description = "Flower wheel with all controls",
+                color = color1,
+                onClick = { showDialog1 = true }
+            )
 
-        // Dialog 2: Simple
-        DialogDemoCard(
-            title = "Simple Circle Wheel",
-            description = "Circle wheel with basic controls",
-            color = color2,
-            onClick = { showDialog2 = true }
-        )
+            // Dialog 2: Simple
+            DialogDemoCard(
+                title = "Simple Circle Wheel",
+                description = "Circle wheel with basic controls",
+                color = color2,
+                onClick = { showDialog2 = true }
+            )
 
-        // Dialog 3: Minimal
-        DialogDemoCard(
-            title = "Minimal Dialog",
-            description = "Wheel only, no sliders",
-            color = color3,
-            onClick = { showDialog3 = true }
-        )
-    }
+            // Dialog 3: Minimal
+            DialogDemoCard(
+                title = "Minimal Dialog",
+                description = "Wheel only, no sliders",
+                color = color3,
+                onClick = { showDialog3 = true }
+            )
+        }
 
-    // Dialog 1
-    if (showDialog1) {
-        ColorPickerDialog(
-            onDismissRequest = { showDialog1 = false },
-            onColorSelected = { color1 = it },
-            initialColor = color1,
-            title = "Choose Color",
-            wheelType = ColorPickerState.WheelType.FLOWER,
-            showAlphaSlider = true,
-            showLightnessSlider = true,
-            showColorEdit = true
-        )
-    }
+        // Dialog 1
+        if (showDialog1) {
+            ColorPickerDialog(
+                onDismissRequest = { showDialog1 = false },
+                onColorSelected = { color1 = it },
+                initialColor = color1,
+                title = "Choose Color",
+                wheelType = ColorPickerState.WheelType.FLOWER,
+                showAlphaSlider = true,
+                showLightnessSlider = true,
+                showColorEdit = true
+            )
+        }
 
-    // Dialog 2
-    if (showDialog2) {
-        ColorPickerDialog(
-            onDismissRequest = { showDialog2 = false },
-            onColorSelected = { color2 = it },
-            initialColor = color2,
-            title = "Pick a Color",
-            wheelType = ColorPickerState.WheelType.CIRCLE,
-            showAlphaSlider = false,
-            showLightnessSlider = true,
-            showColorEdit = false
-        )
-    }
+        // Dialog 2
+        if (showDialog2) {
+            ColorPickerDialog(
+                onDismissRequest = { showDialog2 = false },
+                onColorSelected = { color2 = it },
+                initialColor = color2,
+                title = "Pick a Color",
+                wheelType = ColorPickerState.WheelType.CIRCLE,
+                showAlphaSlider = false,
+                showLightnessSlider = true,
+                showColorEdit = false
+            )
+        }
 
-    // Dialog 3
-    if (showDialog3) {
-        ColorPickerDialog(
-            onDismissRequest = { showDialog3 = false },
-            onColorSelected = { color3 = it },
-            initialColor = color3,
-            title = "Select Color",
-            wheelType = ColorPickerState.WheelType.FLOWER,
-            showAlphaSlider = false,
-            showLightnessSlider = false,
-            showColorEdit = false
-        )
-    }
+        // Dialog 3
+        if (showDialog3) {
+            ColorPickerDialog(
+                onDismissRequest = { showDialog3 = false },
+                onColorSelected = { color3 = it },
+                initialColor = color3,
+                title = "Select Color",
+                wheelType = ColorPickerState.WheelType.FLOWER,
+                showAlphaSlider = false,
+                showLightnessSlider = false,
+                showColorEdit = false
+            )
+        }
     }
 }
 

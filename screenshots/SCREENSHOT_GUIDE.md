@@ -43,88 +43,98 @@ adb shell rm /sdcard/screenshot.png
 Capture the following screens for the Play Store:
 
 ### 1. Full Featured Screen (`01_full_featured.png`)
+
 - **Tab**: Full Featured (first tab)
 - **State**: Showing complete color picker with flower wheel
 - **What to show**:
-  - Interactive color wheel prominently displayed
-  - All sliders visible (lightness + alpha)
-  - Hex color code input field
-  - Selected color preview card at top
-  - RGB/A values displayed
+    - Interactive color wheel prominently displayed
+    - All sliders visible (lightness + alpha)
+    - Hex color code input field
+    - Selected color preview card at top
+    - RGB/A values displayed
 - **Color to select**: Vibrant blue (#2196F3) or similar eye-catching color
 
 ### 2. Dialog Example (`02_dialog_picker.png`)
+
 - **Tab**: Dialogs (second tab)
 - **State**: One of the dialog cards OPEN showing the picker
 - **What to show**:
-  - Material3 dialog with color picker inside
-  - Dialog title "Choose Color"
-  - OK and Cancel buttons
-  - Color wheel visible in dialog
+    - Material3 dialog with color picker inside
+    - Dialog title "Choose Color"
+    - OK and Cancel buttons
+    - Color wheel visible in dialog
 - **Recommended**: Use the "Full Featured Dialog" option
 
 ### 3. Comparison Screen - Flower (`03_flower_wheel.png`)
+
 - **Tab**: Comparison (third tab)
 - **State**: Scrolled to show the Flower Wheel card clearly
 - **What to show**:
-  - Title "Flower Wheel" clearly visible
-  - Full flower-style color wheel
-  - Description text
-  - "Best for" recommendation text
+    - Title "Flower Wheel" clearly visible
+    - Full flower-style color wheel
+    - Description text
+    - "Best for" recommendation text
 
 ### 4. Comparison Screen - Circle (`04_circle_wheel.png`)
+
 - **Tab**: Comparison (third tab)
 - **State**: Scrolled to show the Circle Wheel card clearly
 - **What to show**:
-  - Title "Circle Wheel" clearly visible
-  - Full circle-style color wheel
-  - Description text
-  - Clean, uniform appearance
+    - Title "Circle Wheel" clearly visible
+    - Full circle-style color wheel
+    - Description text
+    - Clean, uniform appearance
 
 ### 5. Preferences/Settings (`05_preferences.png`)
+
 - **Tab**: Settings (fourth tab)
 - **State**: Showing all color preferences
 - **What to show**:
-  - Theme preview card at top showing all colors
-  - List of preferences (Primary, Secondary, Accent, Background)
-  - Color indicators next to each preference
-  - Hex codes visible
-  - DataStore integration info card
+    - Theme preview card at top showing all colors
+    - List of preferences (Primary, Secondary, Accent, Background)
+    - Color indicators next to each preference
+    - Hex codes visible
+    - DataStore integration info card
 
 ### 6. Preference Dialog Open (`06_preference_dialog.png`)
+
 - **Tab**: Settings (fourth tab)
 - **State**: One preference dialog OPEN
 - **What to show**:
-  - Settings screen in background
-  - Color picker dialog overlay
-  - Preference being edited (e.g., "Primary Color")
-  - Full color picker with wheel
+    - Settings screen in background
+    - Color picker dialog overlay
+    - Preference being edited (e.g., "Primary Color")
+    - Full color picker with wheel
 
 ### 7. Custom Color Selection (`07_custom_selection.png`)
+
 - **Tab**: Full Featured
 - **State**: User has selected an interesting color
 - **What to show**:
-  - Unique color selected (e.g., coral, teal, or purple)
-  - Sliders adjusted to show different values
-  - Color preview showing the selected color
-  - Hex code clearly readable
+    - Unique color selected (e.g., coral, teal, or purple)
+    - Sliders adjusted to show different values
+    - Color preview showing the selected color
+    - Hex code clearly readable
 
 ### 8. Dense Wheel Detail (`08_dense_wheel.png`)
+
 - **Tab**: Comparison
 - **State**: Scrolled to "High Density" wheel
 - **What to show**:
-  - High-density wheel with many color points
-  - Title "High Density (More Detail)"
-  - Demonstrates the granular color selection
+    - High-density wheel with many color points
+    - Title "High Density (More Detail)"
+    - Demonstrates the granular color selection
 
 ## Screenshot Naming Convention
 
 Use the following naming pattern:
+
 ```
 [number]_[screen_name].png
 ```
 
 Examples:
+
 - `01_full_featured.png`
 - `02_dialog_picker.png`
 - `03_flower_wheel.png`
@@ -147,6 +157,7 @@ convert screenshot.png -resize 1080x1920 screenshot_resized.png
 ### Using Android Asset Studio
 
 Visit: https://developer.android.com/distribute/marketing-tools/device-art-generator
+
 - Upload your screenshots
 - Choose "Phone" device
 - Download with frame
@@ -175,6 +186,7 @@ Visit: https://developer.android.com/distribute/marketing-tools/device-art-gener
 ## Play Store Listing Text Suggestions
 
 ### Short Description (80 characters max)
+
 "Modern Jetpack Compose color picker with interactive wheels and Material3 design"
 
 ### Full Description

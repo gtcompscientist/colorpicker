@@ -1,11 +1,16 @@
 # Color Picker Library - Compose Migration Plan
 
 ## Executive Summary
-This document outlines the complete migration strategy to modernize the color picker library using Jetpack Compose, Kotlin Flows, coroutines, and modern Kotlin patterns. The library currently uses traditional Android Views and can be significantly simplified with Compose's declarative UI paradigm.
+
+This document outlines the complete migration strategy to modernize the color picker library using
+Jetpack Compose, Kotlin Flows, coroutines, and modern Kotlin patterns. The library currently uses
+traditional Android Views and can be significantly simplified with Compose's declarative UI
+paradigm.
 
 ## Current Architecture Analysis
 
 ### Core Components
+
 1. **ColorPickerView** - Custom View for color wheel interaction (527 lines)
 2. **ColorPickerDialogBuilder** - Builder pattern for creating dialogs (284 lines)
 3. **ColorPickerPreference** - Deprecated Preference integration (143 lines)
@@ -14,6 +19,7 @@ This document outlines the complete migration strategy to modernize the color pi
 6. **Support Classes** - ColorCircle, ColorExtensions, listeners
 
 ### Key Issues to Address
+
 - Heavy use of custom Views with manual Canvas drawing
 - Callback-based listeners (OnColorChangedListener, OnColorSelectedListener)
 - Builder pattern creating complex initialization
@@ -28,6 +34,7 @@ This document outlines the complete migration strategy to modernize the color pi
 ### Phase 1: Foundation - Modern Kotlin Patterns
 
 #### 1.1 Create State Management Layer
+
 **File**: `library/src/main/java/co/csadev/colorpicker/state/ColorPickerState.kt`
 
 ```kotlin
@@ -62,11 +69,13 @@ fun rememberColorPickerState(
 ```
 
 #### 1.2 Replace Listeners with Flows
+
 **File**: `library/src/main/java/co/csadev/colorpicker/ColorPickerEvents.kt`
 
 ```kotlin
 sealed interface ColorPickerEvent {
-    data class ColorChanged(val color: Color, val alpha: Float, val lightness: Float) : ColorPickerEvent
+    data class ColorChanged(val color: Color, val alpha: Float, val lightness: Float) :
+        ColorPickerEvent
     data class ColorSelected(val finalColor: Color) : ColorPickerEvent
 }
 
@@ -104,6 +113,7 @@ fun LaunchedColorPickerEventListener(
 ```
 
 #### 1.3 Modernize Color Extensions
+
 **File**: Update `library/src/main/java/co/csadev/colorpicker/ColorExtensions.kt`
 
 ```kotlin
@@ -130,15 +140,16 @@ fun HSV.toColor(alpha: Float = 1f): androidx.compose.ui.graphics.Color {
 
 // Replace String formatting
 val androidx.compose.ui.graphics.Color.hexString: String
-    get() = "#%06X".format(0xFFFFFF and toArgb()).uppercase()
+get() = "#%06X".format(0xFFFFFF and toArgb()).uppercase()
 
 val androidx.compose.ui.graphics.Color.hexStringWithAlpha: String
-    get() = "#%08X".format(toArgb()).uppercase()
+get() = "#%08X".format(toArgb()).uppercase()
 ```
 
 ### Phase 2: Core Composables
 
 #### 2.1 Color Wheel Composable
+
 **File**: `library/src/main/java/co/csadev/colorpicker/compose/ColorWheel.kt`
 
 ```kotlin
@@ -249,6 +260,7 @@ private suspend fun calculateColorFromOffset(
 ```
 
 #### 2.2 Slider Composables
+
 **File**: `library/src/main/java/co/csadev/colorpicker/compose/Sliders.kt`
 
 ```kotlin
@@ -350,6 +362,7 @@ private fun DrawScope.drawCheckerboard(checkerSize: Float) {
 ```
 
 #### 2.3 Color Preview Composable
+
 **File**: `library/src/main/java/co/csadev/colorpicker/compose/ColorPreview.kt`
 
 ```kotlin
@@ -386,6 +399,7 @@ fun ColorPreview(
 ```
 
 #### 2.4 Main Color Picker Composable
+
 **File**: `library/src/main/java/co/csadev/colorpicker/compose/ColorPicker.kt`
 
 ```kotlin
@@ -522,6 +536,7 @@ private fun ColorEditField(
 ### Phase 3: Dialog Integration
 
 #### 3.1 Material3 Dialog
+
 **File**: `library/src/main/java/co/csadev/colorpicker/compose/ColorPickerDialog.kt`
 
 ```kotlin
@@ -638,6 +653,7 @@ fun ColorPickerDialogHost(
 ### Phase 4: Preferences Integration (DataStore)
 
 #### 4.1 Modern Settings Integration
+
 **File**: `library/src/main/java/co/csadev/colorpicker/compose/ColorPickerPreference.kt`
 
 ```kotlin
@@ -720,6 +736,7 @@ fun ColorPreferenceExample(dataStore: DataStore<Preferences>) {
 ### Phase 5: Testing & Utilities
 
 #### 5.1 Testing Support
+
 **File**: `library/src/main/java/co/csadev/colorpicker/testing/ColorPickerTestUtils.kt`
 
 ```kotlin
@@ -744,6 +761,7 @@ var SemanticsPropertyReceiver.sliderType by ColorSliderSemantics
 ```
 
 #### 5.2 Preview Utilities
+
 **File**: `library/src/main/java/co/csadev/colorpicker/compose/Preview.kt`
 
 ```kotlin
@@ -793,6 +811,7 @@ private fun ColorPickerPreferencePreview() {
 ### Phase 6: Migration & Deprecation
 
 #### 6.1 Deprecation Strategy
+
 **File**: Update existing files with deprecation warnings
 
 ```kotlin
@@ -824,6 +843,7 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
 ```
 
 #### 6.2 Interop Layer
+
 **File**: `library/src/main/java/co/csadev/colorpicker/interop/ViewInterop.kt`
 
 ```kotlin
@@ -854,16 +874,20 @@ class ComposeColorPickerView @JvmOverloads constructor(
 ### Phase 7: Documentation & Migration Guide
 
 #### 7.1 Create Migration Guide
+
 **File**: `MIGRATION.md`
 
 Include examples showing:
+
 - Before/After code comparisons
 - Common patterns in View system → Compose equivalents
 - DataStore replacement for Preferences
 - Flow-based event handling
 
 #### 7.2 Update README
+
 Add sections for:
+
 - Compose-first approach
 - Quick start with Compose
 - Legacy View support (deprecated)
@@ -872,6 +896,7 @@ Add sections for:
 ## Implementation Checklist
 
 ### Must-Have (MVP)
+
 - [ ] ColorPickerState and state management
 - [ ] Basic ColorWheel composable with gesture handling
 - [ ] LightnessSlider and AlphaSlider composables
@@ -884,6 +909,7 @@ Add sections for:
 - [ ] Migration guide documentation
 
 ### Should-Have
+
 - [ ] ColorPickerPreferenceItem with DataStore
 - [ ] Color preview grid composable
 - [ ] Multiple wheel types (Flower, Circle)
@@ -896,6 +922,7 @@ Add sections for:
 - [ ] Performance optimization for Canvas drawing
 
 ### Nice-to-Have
+
 - [ ] Custom color palettes support
 - [ ] Color harmony suggestions (complementary, triadic, etc.)
 - [ ] Recent colors history
@@ -910,32 +937,32 @@ Add sections for:
 ## Benefits of This Migration
 
 1. **Reduced Code Complexity**: ~60% reduction in code (estimated)
-   - No manual Canvas/Bitmap management
-   - Declarative UI reduces boilerplate
-   - Built-in state management
+    - No manual Canvas/Bitmap management
+    - Declarative UI reduces boilerplate
+    - Built-in state management
 
 2. **Modern Kotlin Features**
-   - Coroutines for async operations
-   - Flows for reactive events
-   - Extension functions for cleaner API
-   - Data classes for immutable state
+    - Coroutines for async operations
+    - Flows for reactive events
+    - Extension functions for cleaner API
+    - Data classes for immutable state
 
 3. **Better Performance**
-   - Compose's smart recomposition
-   - Automatic optimization
-   - Reduced memory allocations
+    - Compose's smart recomposition
+    - Automatic optimization
+    - Reduced memory allocations
 
 4. **Improved Developer Experience**
-   - Preview support for rapid iteration
-   - Better testability with Compose testing APIs
-   - Type-safe builders
-   - Null safety throughout
+    - Preview support for rapid iteration
+    - Better testability with Compose testing APIs
+    - Type-safe builders
+    - Null safety throughout
 
 5. **Future-Proof**
-   - Compose is Android's modern UI toolkit
-   - Active development and support
-   - Better integration with Material Design 3
-   - Multiplatform potential (Compose Multiplatform)
+    - Compose is Android's modern UI toolkit
+    - Active development and support
+    - Better integration with Material Design 3
+    - Multiplatform potential (Compose Multiplatform)
 
 ## Breaking Changes
 
@@ -959,4 +986,7 @@ Add sections for:
 
 ## Conclusion
 
-This migration plan transforms the color picker library from a View-based implementation to a modern, Compose-first library using coroutines, Flows, and modern Kotlin patterns. The result will be a significantly simpler, more maintainable, and future-proof library that provides a better developer experience while maintaining backward compatibility during the transition period.
+This migration plan transforms the color picker library from a View-based implementation to a
+modern, Compose-first library using coroutines, Flows, and modern Kotlin patterns. The result will
+be a significantly simpler, more maintainable, and future-proof library that provides a better
+developer experience while maintaining backward compatibility during the transition period.

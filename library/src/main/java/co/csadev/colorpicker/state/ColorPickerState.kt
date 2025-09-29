@@ -1,5 +1,7 @@
 package co.csadev.colorpicker.state
 
+import androidx.annotation.FloatRange
+import androidx.annotation.IntRange
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -17,14 +19,15 @@ import androidx.compose.ui.graphics.Color
  * @property wheelType The type of color wheel to display
  * @property density The density of color points on the wheel
  */
+@Suppress("ANNOTATION_WILL_BE_APPLIED_ALSO_TO_PROPERTY_OR_FIELD")
 @Stable
 data class ColorPickerState(
     val selectedColor: Color,
-    val alpha: Float = 1f,
-    val lightness: Float = 1f,
+    @FloatRange(0.0, 1.0) val alpha: Float = 1f,
+    @FloatRange(0.0, 1.0) val lightness: Float = 1f,
     val colors: List<Color> = emptyList(),
     val wheelType: WheelType = WheelType.FLOWER,
-    val density: Int = 8
+    @IntRange(2L) val density: Int = 8
 ) {
     /**
      * Types of color wheels available.

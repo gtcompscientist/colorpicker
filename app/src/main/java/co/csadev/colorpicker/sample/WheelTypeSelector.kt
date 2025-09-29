@@ -1,6 +1,5 @@
 package co.csadev.colorpicker.sample
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.FilterVintage
@@ -33,10 +32,11 @@ fun WheelTypeSelector(
                     Icon(
                         imageVector = Icons.Default.FilterVintage,
                         contentDescription = "Flower wheel",
-                        tint = if (wheelType == ColorPickerState.WheelType.FLOWER)
+                        tint = if (wheelType == ColorPickerState.WheelType.FLOWER) {
                             MaterialTheme.colorScheme.onSecondaryContainer
-                        else
+                        } else {
                             MaterialTheme.colorScheme.onSurface
+                        }
                     )
                 }
             }
@@ -53,10 +53,11 @@ fun WheelTypeSelector(
                     Icon(
                         imageVector = Icons.Default.Circle,
                         contentDescription = "Circle wheel",
-                        tint = if (wheelType == ColorPickerState.WheelType.CIRCLE)
+                        tint = if (wheelType == ColorPickerState.WheelType.CIRCLE) {
                             MaterialTheme.colorScheme.onSecondaryContainer
-                        else
+                        } else {
                             MaterialTheme.colorScheme.onSurface
+                        }
                     )
                 }
             }

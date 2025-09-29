@@ -23,19 +23,21 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.preferencesDataStore
+import co.csadev.colorpicker.R
 import co.csadev.colorpicker.compose.ColorPickerPreferenceItem
 import co.csadev.colorpicker.compose.getColorFlow
 import co.csadev.colorpicker.compose.saveColor
 import co.csadev.colorpicker.sample.ViewCodeButton
+import co.csadev.colorpicker.sample.ui.theme.ColorPickerTheme
 import kotlinx.coroutines.launch
 
 val Context.dataStore by preferencesDataStore(name = "color_preferences")
@@ -61,7 +63,8 @@ fun PreferencesExample() {
             }
         },
         showAlphaSlider = false,
-        showLightnessSlider = true
+        showLightnessSlider = true,
+        content = { ColorPickerTheme(content = it) }
     )
 }
 """
@@ -117,160 +120,164 @@ fun PreferencesScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Header
-        Text(
-            text = "Theme Preferences",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+            Text(
+                text = "Theme Preferences",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
 
-        Text(
-            text = "Customize your app theme colors with DataStore persistence",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+            Text(
+                text = "Customize your app theme colors with DataStore persistence",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
-        // Preview Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            // Preview Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Text(
-                    text = "Theme Preview",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(backgroundColor)
-                        .padding(16.dp)
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    Text(
+                        text = "Theme Preview",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(backgroundColor)
+                            .padding(16.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(24.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(primaryColor)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(0.7f)
-                                .height(16.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(secondaryColor)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(0.5f)
-                                .height(12.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(accentColor)
-                        )
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(24.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(primaryColor)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.7f)
+                                    .height(16.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(secondaryColor)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.5f)
+                                    .height(12.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(accentColor)
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        // Preferences
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column {
-                ColorPickerPreferenceItem(
-                    title = "Primary Color",
-                    color = primaryColor,
-                    summary = "Main theme color",
-                    onColorChange = { color ->
-                        scope.launch {
-                            context.dataStore.saveColor("primary_color", color)
-                        }
-                    },
-                    showAlphaSlider = false,
-                    showLightnessSlider = true
-                )
-
-                HorizontalDivider()
-
-                ColorPickerPreferenceItem(
-                    title = "Secondary Color",
-                    color = secondaryColor,
-                    summary = "Complementary theme color",
-                    onColorChange = { color ->
-                        scope.launch {
-                            context.dataStore.saveColor("secondary_color", color)
-                        }
-                    },
-                    showAlphaSlider = false,
-                    showLightnessSlider = true
-                )
-
-                HorizontalDivider()
-
-                ColorPickerPreferenceItem(
-                    title = "Accent Color",
-                    color = accentColor,
-                    summary = "Highlight and emphasis color",
-                    onColorChange = { color ->
-                        scope.launch {
-                            context.dataStore.saveColor("accent_color", color)
-                        }
-                    },
-                    showAlphaSlider = false,
-                    showLightnessSlider = true
-                )
-
-                HorizontalDivider()
-
-                ColorPickerPreferenceItem(
-                    title = "Background Color",
-                    color = backgroundColor,
-                    summary = "Main background color",
-                    onColorChange = { color ->
-                        scope.launch {
-                            context.dataStore.saveColor("background_color", color)
-                        }
-                    },
-                    showAlphaSlider = true,
-                    showLightnessSlider = true
-                )
-            }
-        }
-
-        // Info Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            // Preferences
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Text(
-                    text = "✨ DataStore Integration",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                Column {
+                    ColorPickerPreferenceItem(
+                        title = "Primary Color",
+                        color = primaryColor,
+                        summary = "Main theme color",
+                        onColorChange = { color ->
+                            scope.launch {
+                                context.dataStore.saveColor("primary_color", color)
+                            }
+                        },
+                        showAlphaSlider = false,
+                        showLightnessSlider = true,
+                        content = { ColorPickerTheme(content = it) }
+                    )
+
+                    HorizontalDivider()
+
+                    ColorPickerPreferenceItem(
+                        title = "Secondary Color",
+                        color = secondaryColor,
+                        summary = "Complementary theme color",
+                        onColorChange = { color ->
+                            scope.launch {
+                                context.dataStore.saveColor("secondary_color", color)
+                            }
+                        },
+                        showAlphaSlider = false,
+                        showLightnessSlider = true,
+                        content = { ColorPickerTheme(content = it) }
+                    )
+
+                    HorizontalDivider()
+
+                    ColorPickerPreferenceItem(
+                        title = "Accent Color",
+                        color = accentColor,
+                        summary = "Highlight and emphasis color",
+                        onColorChange = { color ->
+                            scope.launch {
+                                context.dataStore.saveColor("accent_color", color)
+                            }
+                        },
+                        showAlphaSlider = false,
+                        showLightnessSlider = true,
+                        content = { ColorPickerTheme(content = it) }
+                    )
+
+                    HorizontalDivider()
+
+                    ColorPickerPreferenceItem(
+                        title = "Background Color",
+                        color = backgroundColor,
+                        summary = "Main background color",
+                        onColorChange = { color ->
+                            scope.launch {
+                                context.dataStore.saveColor("background_color", color)
+                            }
+                        },
+                        showAlphaSlider = true,
+                        showLightnessSlider = true,
+                        content = { ColorPickerTheme(content = it) }
+                    )
+                }
+            }
+
+            // Info Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
-                Text(
-                    text = "Colors are automatically persisted using Jetpack DataStore and will be restored when you reopen the app.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "✨ DataStore Integration",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = stringResource(R.string.colors_are_automatically_persisted),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
             }
         }
-    }
     }
 }

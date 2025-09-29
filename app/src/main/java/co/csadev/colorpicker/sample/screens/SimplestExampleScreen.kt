@@ -18,8 +18,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import co.csadev.colorpicker.R
 import co.csadev.colorpicker.compose.ColorPicker
 import co.csadev.colorpicker.sample.ViewCodeButton
 import co.csadev.colorpicker.sample.WheelTypeSelector
@@ -73,7 +75,7 @@ fun SimplestExampleScreen() {
             )
 
             Text(
-                text = "This is the simplest possible color picker implementation. Just one composable with minimal configuration.",
+                text = stringResource(R.string.this_is_the_simplest_possible),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

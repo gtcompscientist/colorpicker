@@ -7,13 +7,13 @@ This guide explains how to use the modernized Jetpack Compose color picker libra
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Basic Usage](#basic-usage)
-  - [Simple Color Picker](#simple-color-picker)
-  - [Color Picker Dialog](#color-picker-dialog)
-  - [Color Sliders](#color-sliders)
+    - [Simple Color Picker](#simple-color-picker)
+    - [Color Picker Dialog](#color-picker-dialog)
+    - [Color Sliders](#color-sliders)
 - [Advanced Usage](#advanced-usage)
-  - [Custom Configuration](#custom-configuration)
-  - [Event Handling](#event-handling)
-  - [State Management](#state-management)
+    - [Custom Configuration](#custom-configuration)
+    - [Event Handling](#event-handling)
+    - [State Management](#state-management)
 - [Preferences Integration](#preferences-integration)
 - [Customization](#customization)
 - [Migration from View-Based Library](#migration-from-view-based-library)
@@ -29,6 +29,7 @@ dependencies {
 ```
 
 Minimum Requirements:
+
 - **Android API 24+**
 - **Kotlin 1.9+**
 - **Jetpack Compose BOM 2025.09.01+**
@@ -554,7 +555,7 @@ fun OptimizedExample() {
 
 ### Issue: Colors appear incorrect
 
-**Solution**: Ensure you're using `androidx.compose.ui.graphics.Color`, not `android.graphics.Color`.
+**Solution**: Ensure you're using `androidx.compose.ui.graphics.Color`, not`android.graphics.Color`.
 
 ### Issue: Dialog doesn't dismiss
 
@@ -584,6 +585,7 @@ scope.launch {
 ## Examples Repository
 
 For more examples, check the sample app in the repository:
+
 - Basic color picker usage
 - Dialog integration
 - Preferences screen
@@ -593,6 +595,7 @@ For more examples, check the sample app in the repository:
 ## Support
 
 For issues, questions, or contributions:
+
 - GitHub Issues: [github.com/yourrepo/colorpicker/issues](https://github.com)
 - Documentation: [Complete API documentation](https://docs.example.com)
 

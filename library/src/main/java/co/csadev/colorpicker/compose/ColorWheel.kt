@@ -13,7 +13,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -23,9 +22,9 @@ import co.csadev.colorpicker.renderer.ColorWheelRenderOption
 import co.csadev.colorpicker.renderer.FlowerColorWheelRenderer
 import co.csadev.colorpicker.renderer.SimpleColorWheelRenderer
 import co.csadev.colorpicker.state.ColorPickerState
+import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.hypot
-import kotlin.math.PI
 
 /**
  * A color wheel for selecting hue and saturation.
@@ -59,7 +58,10 @@ fun ColorWheel(
                 detectTapGestures { offset ->
                     val color = calculateColorFromPosition(
                         offset = offset,
-                        size = androidx.compose.ui.geometry.Size(size.width.toFloat(), size.height.toFloat()),
+                        size = androidx.compose.ui.geometry.Size(
+                            size.width.toFloat(),
+                            size.height.toFloat()
+                        ),
                         lightness = lightness,
                         alpha = alpha
                     )
@@ -74,7 +76,10 @@ fun ColorWheel(
                         change.consume()
                         val color = calculateColorFromPosition(
                             offset = change.position,
-                            size = androidx.compose.ui.geometry.Size(size.width.toFloat(), size.height.toFloat()),
+                            size = androidx.compose.ui.geometry.Size(
+                                size.width.toFloat(),
+                                size.height.toFloat()
+                            ),
                             lightness = lightness,
                             alpha = alpha
                         )
