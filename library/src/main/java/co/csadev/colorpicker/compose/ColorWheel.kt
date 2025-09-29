@@ -59,7 +59,7 @@ fun ColorWheel(
                 detectTapGestures { offset ->
                     val color = calculateColorFromPosition(
                         offset = offset,
-                        size = size,
+                        size = androidx.compose.ui.geometry.Size(size.width.toFloat(), size.height.toFloat()),
                         lightness = lightness,
                         alpha = alpha
                     )
@@ -74,7 +74,7 @@ fun ColorWheel(
                         change.consume()
                         val color = calculateColorFromPosition(
                             offset = change.position,
-                            size = size,
+                            size = androidx.compose.ui.geometry.Size(size.width.toFloat(), size.height.toFloat()),
                             lightness = lightness,
                             alpha = alpha
                         )

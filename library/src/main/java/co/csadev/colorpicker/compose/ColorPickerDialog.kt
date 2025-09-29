@@ -25,6 +25,7 @@ import co.csadev.colorpicker.state.rememberColorPickerState
  * @param title The dialog title
  * @param confirmText The text for the confirm button
  * @param dismissText The text for the dismiss button
+ * @param wheelType The type of color wheel (FLOWER or CIRCLE)
  * @param showAlphaSlider Whether to show the alpha slider
  * @param showLightnessSlider Whether to show the lightness slider
  * @param showColorEdit Whether to show the hex color input
@@ -37,6 +38,7 @@ fun ColorPickerDialog(
     title: String = "Choose Color",
     confirmText: String = "OK",
     dismissText: String = "Cancel",
+    wheelType: co.csadev.colorpicker.state.ColorPickerState.WheelType = co.csadev.colorpicker.state.ColorPickerState.WheelType.FLOWER,
     showAlphaSlider: Boolean = true,
     showLightnessSlider: Boolean = true,
     showColorEdit: Boolean = false,
@@ -51,6 +53,7 @@ fun ColorPickerDialog(
             ColorPicker(
                 modifier = Modifier.fillMaxWidth(),
                 initialColor = initialColor,
+                wheelType = wheelType,
                 showAlphaSlider = showAlphaSlider,
                 showLightnessSlider = showLightnessSlider,
                 showColorEdit = showColorEdit,
