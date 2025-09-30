@@ -6,6 +6,10 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+private const val SIZE_JITTER_FACTOR = 1.2f
+private const val CIRCLE_SIZE_MULTIPLIER = 1.5f
+private const val DENSITY_MULTIPLIER = 2
+
 /**
  * Flower-style color wheel renderer with petal-like appearance.
  *
@@ -16,12 +20,6 @@ import kotlin.math.sin
 class FlowerColorWheelRenderer : AbsColorWheelRenderer() {
     private val paint = PaintBuilder.newPaint().build()
     private val hsvBuffer = FloatArray(3)
-
-    /**
-     * Size variation factor for creating petal effect.
-     * Higher values create more pronounced size differences.
-     */
-    private val sizeJitterFactor = 1.2f
 
     override fun draw() {
         val canvas = renderOption.targetCanvas ?: return
@@ -51,12 +49,16 @@ class FlowerColorWheelRenderer : AbsColorWheelRenderer() {
             val sizeVariation = if (ring == 0) {
                 0f // No variation for center circle
             } else {
-                baseCircleSize * sizeJitterFactor * jitter
+                baseCircleSize * SIZE_JITTER_FACTOR * jitter
             }
-            val circleSize = (baseCircleSize + sizeVariation).coerceAtLeast(1.5f + strokeWidth)
+            val circleSize = (baseCircleSize + sizeVariation).coerceAtLeast(
+                CIRCLE_SIZE_MULTIPLIER + strokeWidth
+            )
 
             // Calculate circles in this ring with size-adjusted spacing
-            val circlesInRing = calcTotalCount(radius, circleSize).coerceAtMost(density * 2)
+            val circlesInRing = calcTotalCount(radius, circleSize).coerceAtMost(
+                density * DENSITY_MULTIPLIER
+            )
 
             // Offset alternate rings for better distribution
             val angleOffset = if (ring % 2 == 0) 0.0 else PI / circlesInRing

@@ -197,6 +197,7 @@ fun AlphaSlider(
 /**
  * Draws a checkerboard pattern for transparency visualization.
  */
+@Suppress("UnusedParameter")
 private fun DrawScope.drawCheckerboard(
     checkerSize: Float,
     cornerRadius: Float = 0f,

@@ -6,6 +6,8 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+private const val CIRCLE_SIZE_DIVISOR = 6f
+
 /**
  * Simple circular color wheel renderer.
  *
@@ -39,7 +41,7 @@ class SimpleColorWheelRenderer : AbsColorWheelRenderer() {
             val radius = maxRadius * radiusRatio
 
             // Increase circle size for overlap to create solid appearance
-            val circleSize = baseCircleSize * ((density +1)/ 6f)
+            val circleSize = baseCircleSize * ((density + 1) / CIRCLE_SIZE_DIVISOR)
 
             // Calculate number of circles for this ring
             val circlesInRing = calcTotalCount(radius, circleSize)

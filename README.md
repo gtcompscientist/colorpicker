@@ -1,11 +1,13 @@
-Color Picker
--------------
+# Color Picker for Jetpack Compose
+
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Color%20Picker-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1693)
 ![https://img.shields.io/github/tag/QuadFlask/colorpicker.svg?label=maven](https://img.shields.io/github/tag/QuadFlask/colorpicker.svg?label=maven)
 
 ![icon](https://github.com/QuadFlask/colorpicker/blob/master/app/src/main/res/drawable-xxxhdpi/ic_launcher.png)
 
-simple android color picker with color wheel and lightness bar.
+Modern Jetpack Compose color picker library with color wheel, lightness slider, and alpha control.
+
+**Pure Compose implementation** - No View-based components!
 
 [<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Get_it_on_Google_play.svg/800px-Get_it_on_Google_play.svg.png" width="150px">](https://play.google.com/store/apps/details?id=co.csadev.colorpicker.sample)
 
@@ -15,7 +17,7 @@ simple android color picker with color wheel and lightness bar.
 
 [Youtube](https://youtu.be/MwWi9X7eqNI)
 
-## Screenshot
+## Screenshots
 
 ### WHEEL_TYPE.FLOWER
 
@@ -25,110 +27,249 @@ simple android color picker with color wheel and lightness bar.
 
 ![screenshot.png](https://github.com/QuadFlask/colorpicker/blob/master/screenshot/screenshot.png)
 
+## Features
+
+- **Pure Jetpack Compose** - No XML layouts or View-based code
+- **Material 3 Design** - Follows latest Material Design guidelines
+- **Two wheel styles** - FLOWER (organic) and CIRCLE (uniform)
+- **Full color control** - Hue, saturation, lightness, and alpha
+- **State management** - Built-in state handling with Compose
+- **Customizable** - Extensive customization options
+- **Kotlin-first** - Modern Kotlin API with coroutines support
+- **DataStore integration** - Easy persistence with Jetpack DataStore
+- **Accessibility** - Semantic properties for screen readers
+
+## Requirements
+
+- **Android API 24+**
+- **Kotlin 1.9+**
+- **Jetpack Compose BOM 2025.09.01+**
+
 ## How to add dependency?
 
 This library is not released in Maven Central, but instead you can use [JitPack](https://jitpack.io)
 
-add remote maven url in `allprojects.repositories`
+Add remote maven url in `settings.gradle.kts`:
 
-```groovy
-allprojects {
-	repositories {
-		maven { url "https://jitpack.io" }
-	}
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
 }
 ```
 
-then add a library dependency
+Then add the library dependency in `build.gradle.kts`:
 
-```groovy
+```kotlin
 dependencies {
-	compile 'com.github.QuadFlask:colorpicker:0.0.13'
+    implementation("com.github.QuadFlask:colorpicker:1.0.0-compose")
 }
 ```
 
-or, you can manually download `aar` and put into your project's `libs` directory.
+> Check out latest version at [releases](https://github.com/QuadFlask/colorpicker/releases)
 
-and add dependency
+## Quick Start
 
-```groovy
-dependencies {
-	compile(name:'[arrFileName]', ext:'aar')
+### Simple Color Picker
+
+```kotlin
+@Composable
+fun MyScreen() {
+    var selectedColor by remember { mutableStateOf(Color.Blue) }
+
+    ColorPicker(
+        initialColor = selectedColor,
+        onColorSelected = { color ->
+            selectedColor = color
+        }
+    )
 }
 ```
 
-> check out latest version at [releases](https://github.com/QuadFlask/colorpicker/releases)
+### Color Picker Dialog
 
-## Usage
+```kotlin
+@Composable
+fun DialogExample() {
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedColor by remember { mutableStateOf(Color.Green) }
 
-As a dialog
+    Button(onClick = { showDialog = true }) {
+        Text("Pick Color")
+    }
 
-```java
-ColorPickerDialogBuilder
-	.with(context)
-	.setTitle("Choose color")
-	.initialColor(currentBackgroundColor)
-	.wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-	.density(12)
-	.setOnColorSelectedListener(new OnColorSelectedListener() {
-		@Override
-		public void onColorSelected(int selectedColor) {
-			toast("onColorSelected: 0x" + Integer.toHexString(selectedColor));
-		}
-	})
-	.setPositiveButton("ok", new ColorPickerClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-			changeBackgroundColor(selectedColor);
-		}
-	})
-	.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-		}
-	})
-	.build()
-	.show();
+    if (showDialog) {
+        ColorPickerDialog(
+            onDismissRequest = { showDialog = false },
+            onColorSelected = { color ->
+                selectedColor = color
+                showDialog = false
+            },
+            initialColor = selectedColor,
+            title = "Choose a Color"
+        )
+    }
+}
 ```
 
-As a widget
+### Individual Components
 
-```xml
-	<co.csadev.colorpicker.ColorPickerView
-		android:id="@+id/color_picker_view"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		app:alphaSlider="true"
-		app:density="12"
-		app:lightnessSlider="true"
-		app:wheelType="FLOWER"
-		app:lightnessSliderView="@+id/v_lightness_slider"
-	    app:alphaSliderView="@+id/v_alpha_slider"
-		/>
+Use components separately for custom layouts:
 
-	<co.csadev.colorpicker.slider.LightnessSlider
-		android:id="@+id/v_lightness_slider"
-		android:layout_width="match_parent"
-		android:layout_height="48dp"
-		/>
+```kotlin
+@Composable
+fun CustomLayout() {
+    var color by remember { mutableStateOf(Color.Red) }
+    var lightness by remember { mutableFloatStateOf(1f) }
+    var alpha by remember { mutableFloatStateOf(1f) }
 
-	<co.csadev.colorpicker.slider.AlphaSlider
-		android:id="@+id/v_alpha_slider"
-		android:layout_width="match_parent"
-		android:layout_height="48dp"
-		/>
+    Column {
+        // Color wheel
+        ColorWheel(
+            wheelType = ColorPickerState.WheelType.FLOWER,
+            density = 12,
+            lightness = lightness,
+            alpha = alpha,
+            onColorSelected = { color = it }
+        )
+
+        // Lightness slider
+        LightnessSlider(
+            color = color,
+            lightness = lightness,
+            onLightnessChange = { lightness = it }
+        )
+
+        // Alpha slider
+        AlphaSlider(
+            color = color,
+            alpha = alpha,
+            onAlphaChange = { alpha = it }
+        )
+    }
+}
 ```
 
-## To do
+## Complete Documentation
 
-* gradle support
-* performance improvement
-* refactoring
+For comprehensive documentation including:
+- Advanced usage patterns
+- State management strategies
+- DataStore integration
+- Event handling
+- Customization options
+- Migration guide from View-based library
+
+See [HOW_TO.md](HOW_TO.md)
+
+## API Overview
+
+### ColorPicker
+
+Main composable with full color picking interface:
+
+```kotlin
+ColorPicker(
+    modifier: Modifier = Modifier,
+    initialColor: Color = Color.White,
+    wheelType: ColorPickerState.WheelType = WheelType.FLOWER,
+    density: Int = 10,
+    showAlphaSlider: Boolean = true,
+    showLightnessSlider: Boolean = true,
+    showColorEdit: Boolean = false,
+    onColorChanged: ((Color) -> Unit)? = null,
+    onColorSelected: ((Color) -> Unit)? = null
+)
+```
+
+### ColorPickerDialog
+
+Dialog wrapper for color picker:
+
+```kotlin
+ColorPickerDialog(
+    onDismissRequest: () -> Unit,
+    onColorSelected: (Color) -> Unit,
+    initialColor: Color = Color.White,
+    title: String = "Choose Color",
+    confirmText: String = "OK",
+    dismissText: String = "Cancel",
+    wheelType: ColorPickerState.WheelType = WheelType.FLOWER,
+    showAlphaSlider: Boolean = true,
+    showLightnessSlider: Boolean = true,
+    showColorEdit: Boolean = false
+)
+```
+
+### ColorWheel
+
+Standalone color wheel component:
+
+```kotlin
+ColorWheel(
+    modifier: Modifier = Modifier,
+    wheelType: ColorPickerState.WheelType = WheelType.FLOWER,
+    density: Int = 10,
+    lightness: Float = 1f,
+    alpha: Float = 1f,
+    onColorChange: ((Color) -> Unit)? = null,
+    onColorSelected: ((Color) -> Unit)? = null
+)
+```
+
+## Wheel Types
+
+**FLOWER** - Organic, petal-like appearance with varying circle sizes
+**CIRCLE** - Clean, uniform circles for precise color selection
+
+## Color Extensions
+
+Utility functions for color manipulation:
+
+```kotlin
+// Convert to/from Android color Int
+val composeColor = Color.Red
+val androidColor: Int = composeColor.toAndroidColor()
+
+// HSV color space
+val hsv: HSV = Color.Blue.toHSV()
+val color: Color = HSV(hue = 180f, saturation = 1f, value = 1f).toColor()
+
+// Lightness operations
+val lightness: Float = Color.Green.lightness
+val darkerGreen = Color.Green.applyLightness(0.3f)
+
+// Hex strings
+val hex: String = Color.Red.hexString // "#FF0000"
+val hexWithAlpha: String = Color.Red.hexStringWithAlpha // "#FFFF0000"
+
+// Parse hex strings
+val parsedColor: Color? = "#FF5733".parseColor()
+```
+
+## Migration from View-Based Version
+
+If you're upgrading from the old View-based library:
+
+1. **Replace imports**: Change `co.csadev.colorpicker.ColorPickerView` to `co.csadev.colorpicker.compose.ColorPicker`
+2. **Use Composables**: Replace XML layouts with Compose functions
+3. **State management**: Use `remember` and `mutableStateOf` instead of instance variables
+4. **Color type**: Use `androidx.compose.ui.graphics.Color` instead of `Int`
+5. **Callbacks**: Lambda parameters instead of listener interfaces
+
+See [HOW_TO.md](HOW_TO.md) for detailed migration guide.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
 ```
-Copyright 2014-2017 QuadFlask
+Copyright 2014-2025 QuadFlask
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
