@@ -1,6 +1,7 @@
 package co.csadev.colorpicker.compose
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Slider
@@ -37,68 +38,70 @@ fun LightnessSlider(
 ) {
     val hsv = color.toHSV()
 
-    Canvas(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(24.dp)
-    ) {
-        val trackHeight = 8.dp.toPx()
-        val cornerRadius = 4.dp.toPx()
-        val trackTop = (size.height - trackHeight) / 2
+    Box(modifier = modifier) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(24.dp)
+        ) {
+            val trackHeight = 8.dp.toPx()
+            val cornerRadius = 4.dp.toPx()
+            val trackTop = (size.height - trackHeight) / 2
 
-        // Draw gradient background
-        val gradient = Brush.horizontalGradient(
-            colors = buildList {
-                for (i in 0..100) {
-                    val l = i / 100f
-                    add(hsv.copy(value = l).toColor(color.alpha))
+            // Draw gradient background
+            val gradient = Brush.horizontalGradient(
+                colors = buildList {
+                    for (i in 0..100) {
+                        val l = i / 100f
+                        add(hsv.copy(value = l).toColor(color.alpha))
+                    }
                 }
-            }
-        )
+            )
 
-        drawRoundRect(
-            brush = gradient,
-            cornerRadius = CornerRadius(cornerRadius),
-            topLeft = Offset(0f, trackTop),
-            size = Size(size.width, trackHeight)
-        )
+            drawRoundRect(
+                brush = gradient,
+                cornerRadius = CornerRadius(cornerRadius),
+                topLeft = Offset(0f, trackTop),
+                size = Size(size.width, trackHeight)
+            )
 
-        // Draw current position indicator
-        val indicatorX = size.width * lightness
-        val indicatorY = size.height / 2
+            // Draw current position indicator
+            val indicatorX = size.width * lightness
+            val indicatorY = size.height / 2
 
-        // Draw outer circle (white border)
-        drawCircle(
-            color = Color.White,
-            radius = 10.dp.toPx(),
-            center = Offset(indicatorX, indicatorY),
-            style = Stroke(width = 2.dp.toPx())
-        )
+            // Draw outer circle (white border)
+            drawCircle(
+                color = Color.White,
+                radius = 10.dp.toPx(),
+                center = Offset(indicatorX, indicatorY),
+                style = Stroke(width = 2.dp.toPx())
+            )
 
-        // Draw inner circle with current lightness color
-        drawCircle(
-            color = hsv.copy(value = lightness).toColor(color.alpha),
-            radius = 8.dp.toPx(),
-            center = Offset(indicatorX, indicatorY)
+            // Draw inner circle with current lightness color
+            drawCircle(
+                color = hsv.copy(value = lightness).toColor(color.alpha),
+                radius = 8.dp.toPx(),
+                center = Offset(indicatorX, indicatorY)
+            )
+        }
+
+        Slider(
+            value = lightness,
+            onValueChange = onLightnessChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(24.dp),
+            enabled = enabled,
+            colors = SliderDefaults.colors(
+                thumbColor = Color.Transparent,
+                activeTrackColor = Color.Transparent,
+                inactiveTrackColor = Color.Transparent,
+                disabledThumbColor = Color.Transparent,
+                disabledActiveTrackColor = Color.Transparent,
+                disabledInactiveTrackColor = Color.Transparent
+            )
         )
     }
-
-    Slider(
-        value = lightness,
-        onValueChange = onLightnessChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(24.dp),
-        enabled = enabled,
-        colors = SliderDefaults.colors(
-            thumbColor = Color.Transparent,
-            activeTrackColor = Color.Transparent,
-            inactiveTrackColor = Color.Transparent,
-            disabledThumbColor = Color.Transparent,
-            disabledActiveTrackColor = Color.Transparent,
-            disabledInactiveTrackColor = Color.Transparent
-        )
-    )
 }
 
 /**
@@ -118,75 +121,77 @@ fun AlphaSlider(
     onAlphaChange: (Float) -> Unit,
     enabled: Boolean = true
 ) {
-    Canvas(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(24.dp)
-    ) {
-        val trackHeight = 8.dp.toPx()
-        val cornerRadius = 4.dp.toPx()
-        val trackTop = (size.height - trackHeight) / 2
+    Box(modifier = modifier) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(24.dp)
+        ) {
+            val trackHeight = 8.dp.toPx()
+            val cornerRadius = 4.dp.toPx()
+            val trackTop = (size.height - trackHeight) / 2
 
-        // Draw checkerboard pattern for transparency visualization
-        drawCheckerboard(
-            checkerSize = 4.dp.toPx(),
-            cornerRadius = cornerRadius,
-            topLeft = Offset(0f, trackTop),
-            size = Size(size.width, trackHeight)
-        )
+            // Draw checkerboard pattern for transparency visualization
+            drawCheckerboard(
+                checkerSize = 4.dp.toPx(),
+                cornerRadius = cornerRadius,
+                topLeft = Offset(0f, trackTop),
+                size = Size(size.width, trackHeight)
+            )
 
-        // Draw gradient background with alpha
-        val gradient = Brush.horizontalGradient(
-            colors = buildList {
-                for (i in 0..100) {
-                    add(color.copy(alpha = i / 100f))
+            // Draw gradient background with alpha
+            val gradient = Brush.horizontalGradient(
+                colors = buildList {
+                    for (i in 0..100) {
+                        add(color.copy(alpha = i / 100f))
+                    }
                 }
-            }
-        )
+            )
 
-        drawRoundRect(
-            brush = gradient,
-            cornerRadius = CornerRadius(cornerRadius),
-            topLeft = Offset(0f, trackTop),
-            size = Size(size.width, trackHeight)
-        )
+            drawRoundRect(
+                brush = gradient,
+                cornerRadius = CornerRadius(cornerRadius),
+                topLeft = Offset(0f, trackTop),
+                size = Size(size.width, trackHeight)
+            )
 
-        // Draw current position indicator
-        val indicatorX = size.width * alpha
-        val indicatorY = size.height / 2
+            // Draw current position indicator
+            val indicatorX = size.width * alpha
+            val indicatorY = size.height / 2
 
-        // Draw outer circle (white border)
-        drawCircle(
-            color = Color.White,
-            radius = 10.dp.toPx(),
-            center = Offset(indicatorX, indicatorY),
-            style = Stroke(width = 2.dp.toPx())
-        )
+            // Draw outer circle (white border)
+            drawCircle(
+                color = Color.White,
+                radius = 10.dp.toPx(),
+                center = Offset(indicatorX, indicatorY),
+                style = Stroke(width = 2.dp.toPx())
+            )
 
-        // Draw inner circle with current alpha color
-        drawCircle(
-            color = color.copy(alpha = alpha),
-            radius = 8.dp.toPx(),
-            center = Offset(indicatorX, indicatorY)
+            // Draw inner circle with current alpha color
+            drawCircle(
+                color = color.copy(alpha = alpha),
+                radius = 8.dp.toPx(),
+                center = Offset(indicatorX, indicatorY)
+            )
+        }
+
+        Slider(
+            value = alpha,
+            onValueChange = onAlphaChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(24.dp),
+            enabled = enabled,
+            colors = SliderDefaults.colors(
+                thumbColor = Color.Transparent,
+                activeTrackColor = Color.Transparent,
+                inactiveTrackColor = Color.Transparent,
+                disabledThumbColor = Color.Transparent,
+                disabledActiveTrackColor = Color.Transparent,
+                disabledInactiveTrackColor = Color.Transparent
+            )
         )
     }
-
-    Slider(
-        value = alpha,
-        onValueChange = onAlphaChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(24.dp),
-        enabled = enabled,
-        colors = SliderDefaults.colors(
-            thumbColor = Color.Transparent,
-            activeTrackColor = Color.Transparent,
-            inactiveTrackColor = Color.Transparent,
-            disabledThumbColor = Color.Transparent,
-            disabledActiveTrackColor = Color.Transparent,
-            disabledInactiveTrackColor = Color.Transparent
-        )
-    )
 }
 
 /**

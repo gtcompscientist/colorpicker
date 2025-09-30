@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import co.csadev.colorpicker.sample.screens.ComparisonScreen
+import co.csadev.colorpicker.sample.screens.CustomizableScreen
 import co.csadev.colorpicker.sample.screens.DialogsScreen
 import co.csadev.colorpicker.sample.screens.EventHandlingScreen
 import co.csadev.colorpicker.sample.screens.FullFeaturedScreen
@@ -47,6 +48,7 @@ fun ColorPickerSampleApp(modifier: Modifier = Modifier) {
     val tabs = listOf(
         NavigationTab("Quick Start", Icons.Default.RocketLaunch),
         NavigationTab("Full Featured", Icons.Default.Palette),
+        NavigationTab("Customizable", Icons.Default.Tune),
         NavigationTab("Dialogs", Icons.Default.Dashboard),
         NavigationTab("Sliders", Icons.Default.Tune),
         NavigationTab("Events", Icons.Default.Event),
@@ -76,6 +78,7 @@ fun ColorPickerSampleApp(modifier: Modifier = Modifier) {
         when (selectedTab) {
             ColorPickerTabs.SIMPLEST_EXAMPLE -> SimplestExampleScreen()
             ColorPickerTabs.FULL_FEATURED -> FullFeaturedScreen()
+            ColorPickerTabs.CUSTOMIZABLE -> CustomizableScreen()
             ColorPickerTabs.DIALOGS -> DialogsScreen()
             ColorPickerTabs.SLIDERS -> SlidersExampleScreen()
             ColorPickerTabs.EVENT_HANDLING -> EventHandlingScreen()
@@ -88,6 +91,7 @@ fun ColorPickerSampleApp(modifier: Modifier = Modifier) {
 enum class ColorPickerTabs {
     SIMPLEST_EXAMPLE,
     FULL_FEATURED,
+    CUSTOMIZABLE,
     DIALOGS,
     SLIDERS,
     EVENT_HANDLING,

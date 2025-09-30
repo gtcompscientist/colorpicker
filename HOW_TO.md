@@ -10,10 +10,13 @@ This guide explains how to use the modernized Jetpack Compose color picker libra
     - [Simple Color Picker](#simple-color-picker)
     - [Color Picker Dialog](#color-picker-dialog)
     - [Color Sliders](#color-sliders)
+    - [Color Wheel](#color-wheel)
 - [Advanced Usage](#advanced-usage)
     - [Custom Configuration](#custom-configuration)
+    - [Customizable Color Wheel](#customizable)
     - [Event Handling](#event-handling)
     - [State Management](#state-management)
+    - [Wheel Comparison](#comparison)
 - [Preferences Integration](#preferences-integration)
 - [Customization](#customization)
 - [Migration from View-Based Library](#migration-from-view-based-library)
@@ -150,8 +153,8 @@ Use individual sliders separately:
 @Composable
 fun SlidersExample() {
     var color by remember { mutableStateOf(Color.Blue) }
-    var lightness by remember { mutableStateOf(0.5f) }
-    var alpha by remember { mutableStateOf(1f) }
+    var lightness by remember { mutableFloatStateOf(0.5f) }
+    var alpha by remember { mutableFloatStateOf(1f) }
 
     Column {
         // Color preview
@@ -183,6 +186,32 @@ fun SlidersExample() {
 }
 ```
 
+### Color Wheel {#color-wheel}
+
+Use the color wheel component directly:
+
+```kotlin
+@Composable
+fun ColorWheelExample() {
+    var selectedColor by remember { mutableStateOf(Color.Red) }
+
+    ColorWheel(
+        wheelType = ColorPickerState.WheelType.CIRCLE,
+        density = 12,
+        lightness = 1f,
+        alpha = 1f,
+        onColorSelected = { color ->
+            selectedColor = color
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+```
+
+The color wheel comes in two styles:
+- **CIRCLE**: Clean uniform circles for precise color selection
+- **FLOWER**: Organic petal-like appearance with varying circle sizes
+
 ## Advanced Usage
 
 ### Custom Configuration
@@ -194,6 +223,8 @@ Configure the color picker to show only specific controls:
 fun CustomConfigExample() {
     ColorPicker(
         initialColor = Color.Magenta,
+        wheelType = ColorPickerState.WheelType.FLOWER,
+        density = 10,
         showAlphaSlider = false,        // Hide alpha control
         showLightnessSlider = true,     // Show lightness control
         showColorEdit = true,           // Show hex input field
@@ -201,6 +232,101 @@ fun CustomConfigExample() {
             // Handle selection
         }
     )
+}
+```
+
+### Customizable Color Wheel {#customizable}
+
+Create an interactive customizable color wheel with live controls:
+
+```kotlin
+@Composable
+fun CustomizableExample() {
+    var baseColor by remember { mutableStateOf(Color.Red) }
+    var wheelType by remember { mutableStateOf(ColorPickerState.WheelType.CIRCLE) }
+    var density by remember { mutableIntStateOf(12) }
+    var lightness by remember { mutableFloatStateOf(1f) }
+    var alpha by remember { mutableFloatStateOf(1f) }
+    var hexInput by remember { mutableStateOf("FFFF0000") }
+
+    // Compute final color
+    val finalColor = baseColor.applyLightness(lightness).copy(alpha = alpha)
+
+    Column {
+        // Color Wheel
+        ColorWheel(
+            wheelType = wheelType,
+            density = density,
+            lightness = lightness,
+            alpha = alpha,
+            onColorSelected = { color ->
+                baseColor = color
+                hexInput = color.applyLightness(lightness)
+                    .copy(alpha = alpha).hexStringWithAlpha
+            }
+        )
+
+        // Wheel Type Selector (Flower/Circle toggle)
+        WheelTypeSelector(
+            wheelType = wheelType,
+            onWheelTypeChange = { wheelType = it }
+        )
+
+        // Density Slider (2-100)
+        Slider(
+            value = density.toFloat(),
+            onValueChange = { density = it.toInt() },
+            valueRange = 2f..100f
+        )
+
+        // Lightness Slider
+        LightnessSlider(
+            color = baseColor,
+            lightness = lightness,
+            onLightnessChange = { newLightness ->
+                lightness = newLightness
+                hexInput = baseColor.applyLightness(newLightness)
+                    .copy(alpha = alpha).hexStringWithAlpha
+            }
+        )
+
+        // Alpha Slider
+        AlphaSlider(
+            color = baseColor.applyLightness(lightness),
+            alpha = alpha,
+            onAlphaChange = { newAlpha ->
+                alpha = newAlpha
+                hexInput = baseColor.applyLightness(lightness)
+                    .copy(alpha = newAlpha).hexStringWithAlpha
+            }
+        )
+
+        // Hex Input (supports RRGGBB and AARRGGBB)
+        OutlinedTextField(
+            value = hexInput,
+            onValueChange = { input ->
+                hexInput = input.uppercase()
+                val hex = input.removePrefix("#").uppercase()
+                try {
+                    when (hex.length) {
+                        6 -> {
+                            val color = Color(hex.toLong(16) or 0xFF000000)
+                            baseColor = color
+                            alpha = 1f
+                            lightness = 1f
+                        }
+                        8 -> {
+                            val color = Color(hex.toLong(16))
+                            baseColor = color.copy(alpha = 1f)
+                            alpha = color.alpha
+                            lightness = 1f
+                        }
+                    }
+                } catch (_: Exception) { }
+            },
+            prefix = { Text("#") }
+        )
+    }
 }
 ```
 
@@ -283,6 +409,61 @@ fun Color.Companion.Random() = Color(
     green = kotlin.random.Random.nextFloat(),
     blue = kotlin.random.Random.nextFloat()
 )
+```
+
+### Wheel Comparison {#comparison}
+
+Compare different wheel types and densities:
+
+```kotlin
+@Composable
+fun ComparisonExample() {
+    var flowerColor by remember { mutableStateOf(Color(0xFFFF9800)) }
+    var circleColor by remember { mutableStateOf(Color(0xFF4CAF50)) }
+
+    Column {
+        // Flower Wheel
+        Text("Flower Wheel - Organic petal-like appearance")
+        ColorWheel(
+            wheelType = ColorPickerState.WheelType.FLOWER,
+            density = 10,
+            lightness = 1f,
+            alpha = 1f,
+            onColorSelected = { color ->
+                flowerColor = color
+            }
+        )
+
+        // Circle Wheel
+        Text("Circle Wheel - Clean uniform circles")
+        ColorWheel(
+            wheelType = ColorPickerState.WheelType.CIRCLE,
+            density = 12,
+            lightness = 1f,
+            alpha = 1f,
+            onColorSelected = { color ->
+                circleColor = color
+            }
+        )
+
+        // Low Density vs High Density
+        Text("Low Density (Faster)")
+        ColorWheel(
+            wheelType = ColorPickerState.WheelType.CIRCLE,
+            density = 6,
+            lightness = 1f,
+            alpha = 1f
+        )
+
+        Text("High Density (More Detail)")
+        ColorWheel(
+            wheelType = ColorPickerState.WheelType.CIRCLE,
+            density = 15,
+            lightness = 1f,
+            alpha = 1f
+        )
+    }
+}
 ```
 
 ## Preferences Integration
