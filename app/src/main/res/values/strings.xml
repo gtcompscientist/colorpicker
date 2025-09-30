@@ -1,7 +1,9 @@
 <resources>
-	<string name="app_name">ColorPicker</string>
-	<string name="color_dialog_title">Choose color</string>
-	<string name="title_activity_sample3">SampleActivity3</string>
-	<string name="action_settings">Settings</string>
-	<string name="section_format">Hello World from section: %1$d</string>
+    <string name="app_name">ColorPicker</string>
+    <string name="color_dialog_title">Choose color</string>
+    <string name="title_activity_sample3">SampleActivity3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="colors_are_automatically_persisted">Colors are automatically persisted using Jetpack DataStore and will be restored when you reopen the app.</string>
+    <string name="this_is_the_simplest_possible">This is the simplest possible color picker implementation. Just one composable with minimal configuration.</string>
 </resources>

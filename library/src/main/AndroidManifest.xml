@@ -1,5 +1,5 @@
-<manifest package="com.flask.colorpicker">
+<manifest package="co.csadev.colorpicker">
 
-	<application/>
+    <application />
 
 </manifest>
