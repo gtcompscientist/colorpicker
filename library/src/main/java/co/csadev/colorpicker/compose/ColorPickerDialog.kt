@@ -39,7 +39,8 @@ fun ColorPickerDialog(
     title: String = "Choose Color",
     confirmText: String = "OK",
     dismissText: String = "Cancel",
-    wheelType: co.csadev.colorpicker.state.ColorPickerState.WheelType = co.csadev.colorpicker.state.ColorPickerState.WheelType.FLOWER,
+    wheelType: co.csadev.colorpicker.state.ColorPickerState.WheelType =
+        co.csadev.colorpicker.state.ColorPickerState.WheelType.FLOWER,
     showAlphaSlider: Boolean = true,
     showLightnessSlider: Boolean = true,
     showColorEdit: Boolean = false,

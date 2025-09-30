@@ -72,6 +72,8 @@ fun Color.applyLightness(lightness: Float): Color {
     return hsv.copy(value = lightness).toColor(alpha)
 }
 
+private const val HEX_COLOR_MASK = 0xFFFFFF
+
 /**
  * Gets the hex string representation of this color without alpha.
  * Format: #RRGGBB
@@ -79,7 +81,7 @@ fun Color.applyLightness(lightness: Float): Color {
 val Color.hexString: String
     get() {
         val argb = toArgb()
-        return "#%06X".format(0xFFFFFF and argb).uppercase(Locale.getDefault())
+        return "#%06X".format(HEX_COLOR_MASK and argb).uppercase(Locale.getDefault())
     }
 
 /**
@@ -101,7 +103,8 @@ val Color.hexStringWithAlpha: String
 fun String.parseColor(): Color? {
     return try {
         Color(toColorInt())
-    } catch (e: IllegalArgumentException) {
+    } catch (_: IllegalArgumentException) {
+        // Silently return null for invalid color strings
         null
     }
 }
@@ -111,7 +114,9 @@ fun String.parseColor(): Color? {
  */
 fun Float.toAlphaInt(): Int = (this * 255f).roundToInt().coerceIn(0, 255)
 
+private const val MAX_ALPHA = 255f
+
 /**
  * Converts an Int alpha value (0-255) to a Float (0-1).
  */
-fun Int.toAlphaFloat(): Float = (this / 255f).coerceIn(0f, 1f)
+fun Int.toAlphaFloat(): Float = (this / MAX_ALPHA).coerceIn(0f, 1f)
