@@ -22,7 +22,7 @@ class SimpleColorWheelRenderer : AbsColorWheelRenderer() {
         val centerY = renderOption.centerY ?: (canvas.height / 2f)
         val density = renderOption.density
         val maxRadius = renderOption.maxRadius
-        val circleSize = renderOption.cSize
+        val baseCircleSize = renderOption.cSize
         val strokeWidth = renderOption.strokeWidth
         val lightness = renderOption.lightness
 
@@ -37,6 +37,9 @@ class SimpleColorWheelRenderer : AbsColorWheelRenderer() {
                 0f
             }
             val radius = maxRadius * radiusRatio
+
+            // Increase circle size for overlap to create solid appearance
+            val circleSize = baseCircleSize * ((density +1)/ 6f)
 
             // Calculate number of circles for this ring
             val circlesInRing = calcTotalCount(radius, circleSize)
@@ -64,10 +67,10 @@ class SimpleColorWheelRenderer : AbsColorWheelRenderer() {
                 paint.color = Color.HSVToColor(hsvBuffer)
                 paint.alpha = alphaValueAsInt
 
-                // Draw the circle
+                // Draw the circle with increased size for overlap
                 canvas.drawCircle(x, y, circleSize - strokeWidth, paint)
 
-                // Update color circle list for hit detection
+                // Update color circle list for hit detection (use base size for accuracy)
                 updateOrAddCircle(circleIndex, x, y, hsvBuffer)
                 circleIndex++
             }
