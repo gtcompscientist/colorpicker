@@ -18,8 +18,8 @@ class SimpleColorWheelRenderer : AbsColorWheelRenderer() {
 
     override fun draw() {
         val canvas = renderOption.targetCanvas ?: return
-        val centerX = canvas.width / 2f
-        val centerY = canvas.height / 2f
+        val centerX = renderOption.centerX ?: (canvas.width / 2f)
+        val centerY = renderOption.centerY ?: (canvas.height / 2f)
         val density = renderOption.density
         val maxRadius = renderOption.maxRadius
         val circleSize = renderOption.cSize

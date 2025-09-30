@@ -111,7 +111,9 @@ fun ColorWheel(
             strokeWidth = strokeWidthPx,
             alpha = alpha,
             lightness = lightness,
-            targetCanvas = canvas
+            targetCanvas = canvas,
+            centerX = centerX,
+            centerY = centerY
         )
 
         renderer.renderOption = renderOption

@@ -12,6 +12,8 @@ import android.graphics.Canvas
  * @property alpha Alpha/transparency value (0f to 1f)
  * @property lightness Lightness/brightness value (0f to 1f)
  * @property targetCanvas Canvas to draw on
+ * @property centerX X coordinate of the wheel center (optional, calculated from canvas if not provided)
+ * @property centerY Y coordinate of the wheel center (optional, calculated from canvas if not provided)
  */
 data class ColorWheelRenderOption(
     var density: Int = 8,
@@ -20,7 +22,9 @@ data class ColorWheelRenderOption(
     var strokeWidth: Float = 0f,
     var alpha: Float = 1f,
     var lightness: Float = 1f,
-    var targetCanvas: Canvas? = null
+    var targetCanvas: Canvas? = null,
+    var centerX: Float? = null,
+    var centerY: Float? = null
 ) {
     init {
         require(density >= 2) { "Density must be at least 2" }
