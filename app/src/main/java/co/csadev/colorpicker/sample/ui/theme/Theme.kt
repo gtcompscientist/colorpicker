@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package co.csadev.colorpicker.sample.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme

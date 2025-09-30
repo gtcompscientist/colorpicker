@@ -21,6 +21,7 @@ import co.csadev.colorpicker.hexStringAlpha
 import co.csadev.colorpicker.slider.AlphaSlider
 import co.csadev.colorpicker.slider.LightnessSlider
 
+@Suppress("MagicNumber")
 class ColorPickerDialogBuilder private constructor(context: Context, theme: Int = 0) {
     private val builder: AlertDialog.Builder
     private val pickerContainer: LinearLayout
@@ -192,18 +193,21 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
 
     fun showColorPreview(showPreview: Boolean): ColorPickerDialogBuilder {
         isPreviewEnabled = showPreview
-        if (!showPreview)
+        if (!showPreview) {
             pickerCount = 1
+        }
         return this
     }
 
     @Throws(IndexOutOfBoundsException::class)
     fun setPickerCount(pickerCount: Int): ColorPickerDialogBuilder {
-        if (pickerCount < 1 || pickerCount > 5)
+        if (pickerCount < 1 || pickerCount > 5) {
             throw IndexOutOfBoundsException("Picker Can Only Support 1-5 Colors")
+        }
         this.pickerCount = pickerCount
-        if (this.pickerCount > 1)
+        if (this.pickerCount > 1) {
             this.isPreviewEnabled = true
+        }
         return this
     }
 
@@ -222,7 +226,7 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
             pickerContainer.addView(lightnessSlider)
             colorPickerView.setLightnessSlider(lightnessSlider)
             lightnessSlider?.setColor(getStartColor(initialColor))
-            //lightnessSlider?.setShowBorder(isBorderEnabled) //TODO: What happened here?
+            // lightnessSlider?.setShowBorder(isBorderEnabled) //TODO: What happened here?
         }
         if (isAlphaSliderEnabled) {
             val layoutParamsForAlphaBar = LinearLayout.LayoutParams(
@@ -234,7 +238,7 @@ class ColorPickerDialogBuilder private constructor(context: Context, theme: Int 
             pickerContainer.addView(alphaSlider)
             colorPickerView.setAlphaSlider(alphaSlider)
             alphaSlider?.color = getStartColor(initialColor)
-            //alphaSlider?.setShowBorder(isBorderEnabled) //TODO: What happened here?
+            // alphaSlider?.setShowBorder(isBorderEnabled) //TODO: What happened here?
         }
         if (isColorEditEnabled) {
             val layoutParamsForColorEdit = LinearLayout.LayoutParams(

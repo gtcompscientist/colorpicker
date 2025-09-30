@@ -33,7 +33,6 @@ data class HSV(
         require(saturation in 0f..1f) { "Saturation must be between 0 and 1" }
         require(value in 0f..1f) { "Value must be between 0 and 1" }
     }
-
 }
 
 /**

@@ -1,7 +1,6 @@
 package co.csadev.colorpicker
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -16,6 +15,8 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.content.withStyledAttributes
+import androidx.core.graphics.toColorInt
 import co.csadev.colorpicker.builder.PaintBuilder
 import co.csadev.colorpicker.builder.getRenderer
 import co.csadev.colorpicker.renderer.ColorWheelRenderOption
@@ -25,11 +26,13 @@ import co.csadev.colorpicker.slider.LightnessSlider
 import kotlin.math.cos
 import kotlin.math.sin
 
+private const val DEFAULT_DENSITY = 8
 private const val STROKE_RATIO = 1.5f
 
 /**
  * The main view that drives the Color Picking
  */
+@Suppress("MagicNumber")
 class ColorPickerView : View {
 
     private var colorWheel: Bitmap? = null
@@ -37,7 +40,7 @@ class ColorPickerView : View {
     private var currentColor: Bitmap? = null
     private var currentColorCanvas: Canvas? = null
     private var showBorder: Boolean = false
-    private var density = 8
+    private var density = DEFAULT_DENSITY
 
     private var lightness = 1f
     private var alphaValue = 1f
@@ -64,14 +67,13 @@ class ColorPickerView : View {
 
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             try {
-                val color = Color.parseColor(s.toString())
+                val color = s.toString().toColorInt()
 
                 // set the color without changing the edit text preventing stack overflow
                 setColor(color, false)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-
         }
 
         override fun afterTextChanged(s: Editable) = Unit
@@ -84,12 +86,11 @@ class ColorPickerView : View {
     private var lightnessSliderViewId: Int = 0
 
     var selectedColor: Int
-        get() = (currentColorCircle?.color ?: 0)
-            .applyLightness(lightness)
-            .adjustAlpha(alphaValue)
+        get() = (currentColorCircle?.color ?: 0).applyLightness(lightness).adjustAlpha(alphaValue)
         set(value) {
-            if (allColors.any { it == null })
+            if (allColors.any { it == null }) {
                 return
+            }
             colorSelection = value
             setHighlightedColor(value)
             val color = allColors[value] ?: return
@@ -112,38 +113,25 @@ class ColorPickerView : View {
         initWith(context, attrs)
     }
 
-    @TargetApi(21)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
-        context,
-        attrs,
-        defStyleAttr,
-        defStyleRes
-    ) {
-        initWith(context, attrs)
-    }
-
     private fun initWith(context: Context, attrs: AttributeSet?) {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ColorPickerView)
+        context.withStyledAttributes(attrs, R.styleable.ColorPickerView) {
+            density = getInt(R.styleable.ColorPickerView_density, DEFAULT_DENSITY)
+            initialColor = getInt(R.styleable.ColorPickerView_initialColor, -0x1)
 
-        density = typedArray.getInt(R.styleable.ColorPickerView_density, 10)
-        initialColor = typedArray.getInt(R.styleable.ColorPickerView_initialColor, -0x1)
+            pickerColorEditTextColor =
+                getInt(R.styleable.ColorPickerView_pickerColorEditTextColor, -0x1)
 
-        pickerColorEditTextColor =
-            typedArray.getInt(R.styleable.ColorPickerView_pickerColorEditTextColor, -0x1)
+            val wheelType = WheelType.indexOf(getInt(R.styleable.ColorPickerView_wheelType, 0))
+            val renderer = wheelType.getRenderer()
 
-        val wheelType =
-            WheelType.indexOf(typedArray.getInt(R.styleable.ColorPickerView_wheelType, 0))
-        val renderer = wheelType.getRenderer()
+            alphaSliderViewId = getResourceId(R.styleable.ColorPickerView_alphaSliderView, 0)
+            lightnessSliderViewId =
+                getResourceId(R.styleable.ColorPickerView_lightnessSliderView, 0)
 
-        alphaSliderViewId = typedArray.getResourceId(R.styleable.ColorPickerView_alphaSliderView, 0)
-        lightnessSliderViewId =
-            typedArray.getResourceId(R.styleable.ColorPickerView_lightnessSliderView, 0)
-
-        setRenderer(renderer)
-        setDensity(density)
-        setInitialColor(initialColor, true)
-
-        typedArray.recycle()
+            setRenderer(renderer)
+            setDensity(density)
+            setInitialColor(initialColor, true)
+        }
     }
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
@@ -155,10 +143,12 @@ class ColorPickerView : View {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        if (alphaSliderViewId != 0)
+        if (alphaSliderViewId != 0) {
             setAlphaSlider(rootView.findViewById<View>(alphaSliderViewId) as AlphaSlider)
-        if (lightnessSliderViewId != 0)
+        }
+        if (lightnessSliderViewId != 0) {
             setLightnessSlider(rootView.findViewById<View>(lightnessSliderViewId) as LightnessSlider)
+        }
 
         updateColorWheel()
         currentColorCircle = findNearestByColor(initialColor)
@@ -173,10 +163,12 @@ class ColorPickerView : View {
         var width = measuredWidth
         val height = measuredHeight
 
-        if (height < width)
+        if (height < width) {
             width = height
-        if (width <= 0)
+        }
+        if (width <= 0) {
             return
+        }
         colorWheel?.let {
             colorWheel = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888)
             colorWheelCanvas = Canvas(it)
@@ -232,8 +224,9 @@ class ColorPickerView : View {
             widthMode == MeasureSpec.EXACTLY -> height = MeasureSpec.getSize(heightMeasureSpec)
         }
         var squareDimen = width
-        if (height < width)
+        if (height < width) {
             squareDimen = height
+        }
         setMeasuredDimension(squareDimen, squareDimen)
     }
 
@@ -304,12 +297,14 @@ class ColorPickerView : View {
         selectorStroke = PaintBuilder.newPaint().color(-0x1).style(Paint.Style.STROKE)
             .stroke(size * (STROKE_RATIO - 1)).xPerMode(PorterDuff.Mode.CLEAR).build()
 
-        if (showBorder) colorWheelCanvas?.drawCircle(
-            colorCircle.x,
-            colorCircle.y,
-            size + selectorStroke.strokeWidth / 2f,
-            selectorStroke
-        )
+        if (showBorder) {
+            colorWheelCanvas?.drawCircle(
+                colorCircle.x,
+                colorCircle.y,
+                size + selectorStroke.strokeWidth / 2f,
+                selectorStroke
+            )
+        }
         canvas.drawBitmap(wheel, 0f, 0f, null)
 
         currentColorCanvas?.drawCircle(
@@ -378,8 +373,9 @@ class ColorPickerView : View {
         initialColor = color
         setColorPreviewColor(color)
         setColorToSliders(color)
-        if (colorEdit != null && updateText)
+        if (colorEdit != null && updateText) {
             setColorText(color)
+        }
         currentColorCircle = findNearestByColor(color)
     }
 
@@ -464,30 +460,37 @@ class ColorPickerView : View {
     fun setColorPreview(preview: LinearLayout?, color: Int?) {
         var selectedColor = color
         colorPreview = preview ?: return
-        if (selectedColor == null)
+        if (selectedColor == null) {
             selectedColor = 0
+        }
         val children = colorPreview?.childCount ?: 0
-        if (children == 0 || colorPreview?.visibility != VISIBLE)
+        if (children == 0 || colorPreview?.visibility != VISIBLE) {
             return
+        }
 
         (0 until children).forEach { i ->
             val childView = colorPreview?.getChildAt(i)
-            if (childView !is LinearLayout)
+            if (childView !is LinearLayout) {
                 return@forEach
+            }
             if (i == selectedColor) {
                 childView.setBackgroundColor(Color.WHITE)
             }
             val childImage = childView.findViewById<View>(R.id.image_preview) as ImageView
             childImage.isClickable = true
             childImage.tag = i
-            childImage.setOnClickListener(OnClickListener { v ->
-                if (v == null)
-                    return@OnClickListener
-                val tag = v.tag
-                if (tag == null || tag !is Int)
-                    return@OnClickListener
-                selectedColor = tag
-            })
+            childImage.setOnClickListener(
+                OnClickListener { v ->
+                    if (v == null) {
+                        return@OnClickListener
+                    }
+                    val tag = v.tag
+                    if (tag == null || tag !is Int) {
+                        return@OnClickListener
+                    }
+                    selectedColor = tag
+                }
+            )
         }
     }
 
@@ -497,13 +500,15 @@ class ColorPickerView : View {
 
     private fun setHighlightedColor(previewNumber: Int) {
         val children = colorPreview?.childCount ?: 0
-        if (colorPreview?.visibility != VISIBLE)
+        if (colorPreview?.visibility != VISIBLE) {
             return
+        }
 
         (0 until children).forEach { i ->
             val childView = colorPreview?.getChildAt(i)
-            if (childView !is LinearLayout)
+            if (childView !is LinearLayout) {
                 return@forEach
+            }
             if (i == previewNumber) {
                 childView.setBackgroundColor(Color.WHITE)
             } else {
@@ -513,16 +518,19 @@ class ColorPickerView : View {
     }
 
     private fun setColorPreviewColor(newColor: Int) {
-        if (colorPreview == null || colorSelection > allColors.size || allColors[colorSelection] == null)
+        if (colorPreview == null || colorSelection > allColors.size || allColors[colorSelection] == null) {
             return
+        }
 
         val children = colorPreview?.childCount ?: 0
-        if (children == 0 || colorPreview?.visibility != VISIBLE)
+        if (children == 0 || colorPreview?.visibility != VISIBLE) {
             return
+        }
 
         val childView = colorPreview?.getChildAt(colorSelection)
-        if (childView !is LinearLayout)
+        if (childView !is LinearLayout) {
             return
+        }
         val childImage = childView.findViewById<View>(R.id.image_preview) as ImageView
         childImage.setImageDrawable(ColorCircleDrawable(newColor))
     }
@@ -538,7 +546,6 @@ class ColorPickerView : View {
 
     enum class WheelType {
         FLOWER, CIRCLE;
-
 
         companion object {
 

@@ -46,6 +46,11 @@ android {
         buildConfig = true
     }
 
+    lint {
+        warningsAsErrors = true
+        abortOnError = true
+    }
+
 }
 
 dependencies {

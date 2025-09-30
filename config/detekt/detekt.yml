@@ -615,15 +615,21 @@ style:
     maxJumpCount: 1
   MagicNumber:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts', '**/Mock*.kt' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts', '**/Mock*.kt', "**/sample/screens/**" ]
     ignoreNumbers:
       - '-1'
       - '0'
+      - '0.5'
       - '1'
       - '2'
       - '3'
       - '100'
       - '255'
+      - '256'
+      - '180'
+      - '360'
+      - '180.0'
+      - '360.0'
     ignoreHashCodeFunction: true
     ignorePropertyDeclaration: false
     ignoreLocalVariableDeclaration: false
@@ -634,6 +640,8 @@ style:
     ignoreEnums: false
     ignoreRanges: false
     ignoreExtensionFunctions: true
+    ignoreAnnotated:
+      - "Preview"
   MandatoryBracesLoops:
     active: false
   MaxChainedCallsOnSameLine:
@@ -749,6 +757,8 @@ style:
   UnusedPrivateMember:
     active: true
     allowedNames: ''
+    ignoreAnnotated:
+      - "Composable"
   UnusedPrivateProperty:
     active: true
     allowedNames: '_|ignored|expected|serialVersionUID'

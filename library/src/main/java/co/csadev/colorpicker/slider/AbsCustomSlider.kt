@@ -10,6 +10,11 @@ import android.view.View
 import androidx.annotation.DimenRes
 import co.csadev.colorpicker.R
 
+private const val DEFAULT_HANDLE_RADIUS = 20
+private const val DEFAULT_BAR_HEIGHT = 5
+private const val ROTATE_COUNTER_CLOCKWISE = -90f
+// private const val ROTATE_CLOCKWISE = 90f
+
 @Suppress("ConvertSecondaryConstructorToPrimary")
 abstract class AbsCustomSlider : View {
     protected var bitmap: Bitmap? = null
@@ -18,8 +23,8 @@ abstract class AbsCustomSlider : View {
     protected var barCanvas: Canvas? = null
     protected var onValueChangedListener: OnValueChangedListener? = null
     protected var barOffsetX: Int = 0
-    protected var handleRadius = 20
-    protected var barHeight = 5
+    protected var handleRadius = DEFAULT_HANDLE_RADIUS
+    protected var barHeight = DEFAULT_BAR_HEIGHT
     protected var value = 1f
     protected var showBorder = false
 
@@ -32,7 +37,10 @@ abstract class AbsCustomSlider : View {
         defStyleAttr: Int = 0
     ) : super(context, attrs, defStyleAttr) {
         val styledAttrs = context?.theme?.obtainStyledAttributes(
-            attrs, R.styleable.AbsCustomSlider, 0, 0
+            attrs,
+            R.styleable.AbsCustomSlider,
+            0,
+            0
         )
         try {
             inVerticalOrientation = styledAttrs?.getBoolean(
@@ -86,7 +94,7 @@ abstract class AbsCustomSlider : View {
             width = getHeight()
             height = getWidth()
 
-            canvas.rotate(-90f)
+            canvas.rotate(ROTATE_COUNTER_CLOCKWISE)
             canvas.translate((-width).toFloat(), 0f)
         } else {
             width = getWidth()

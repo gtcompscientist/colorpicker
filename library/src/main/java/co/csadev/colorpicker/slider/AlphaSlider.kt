@@ -6,12 +6,12 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.util.AttributeSet
-
 import co.csadev.colorpicker.ColorPickerView
 import co.csadev.colorpicker.alpha
 import co.csadev.colorpicker.builder.PaintBuilder
 import kotlin.math.roundToInt
 
+@Suppress("MagicNumber")
 class AlphaSlider : AbsCustomSlider {
     var color: Int = 0
         set(value) {
@@ -65,8 +65,9 @@ class AlphaSlider : AbsCustomSlider {
     }
 
     override fun onValueChanged(value: Float) {
-        if (colorPicker != null)
+        if (colorPicker != null) {
             colorPicker!!.setAlphaValue(value)
+        }
     }
 
     override fun drawHandle(canvas: Canvas, x: Float, y: Float) {

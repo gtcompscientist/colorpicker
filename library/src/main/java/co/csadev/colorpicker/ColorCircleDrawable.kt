@@ -3,7 +3,6 @@ package co.csadev.colorpicker
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.drawable.ColorDrawable
-
 import co.csadev.colorpicker.builder.PaintBuilder
 
 class ColorCircleDrawable(color: Int) : ColorDrawable(color) {
@@ -18,7 +17,7 @@ class ColorCircleDrawable(color: Int) : ColorDrawable(color) {
     override fun draw(canvas: Canvas) {
         canvas.drawColor(0)
 
-        val width = canvas.width
+        val width = bounds.width()
         val radius = width / 2f
         strokeWidth = radius / 8f
 

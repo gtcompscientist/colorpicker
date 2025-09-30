@@ -5,11 +5,12 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.util.AttributeSet
-
 import co.csadev.colorpicker.ColorPickerView
 import co.csadev.colorpicker.applyLightness
 import co.csadev.colorpicker.builder.PaintBuilder
 import co.csadev.colorpicker.lightness
+
+private const val PERCENT_75 = 0.75f
 
 @Suppress("ConvertSecondaryConstructorToPrimary")
 class LightnessSlider : AbsCustomSlider {
@@ -53,7 +54,7 @@ class LightnessSlider : AbsCustomSlider {
         if (showBorder) {
             canvas.drawCircle(x, y, handleRadius.toFloat(), clearingStroke)
         }
-        canvas.drawCircle(x, y, handleRadius * 0.75f, solid)
+        canvas.drawCircle(x, y, handleRadius * PERCENT_75, solid)
     }
 
     fun setColor(input: Int) {

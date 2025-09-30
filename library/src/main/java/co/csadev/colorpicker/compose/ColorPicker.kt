@@ -70,7 +70,10 @@ fun ColorPicker(
     LaunchedColorPickerEventListener(
         eventHandler = eventHandler,
         onColorChanged = onColorChanged?.let { callback ->
-            { color, _, _ -> callback(color) }
+            {
+                    color, _, _ ->
+                callback(color)
+            }
         },
         onColorSelected = onColorSelected
     )

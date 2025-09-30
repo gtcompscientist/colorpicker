@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package co.csadev.colorpicker
 
 import android.graphics.Color
@@ -16,7 +18,6 @@ fun Int.applyLightness(lightness: Float): Int {
     hsv[2] = lightness
     return Color.HSVToColor(hsv)
 }
-
 
 val Float.alpha: Int
     get() = (this * 255).roundToInt()

@@ -74,10 +74,11 @@ object PaintBuilder {
         val s = (size / 2f).roundToInt()
         for (i in 0..1)
             for (j in 0..1) {
-                if ((i + j) % 2 == 0)
+                if ((i + j) % 2 == 0) {
                     alphaPatternPaint.color = -0x1
-                else
+                } else {
                     alphaPatternPaint.color = -0x2f2f30
+                }
                 c.drawRect(
                     (i * s).toFloat(),
                     (j * s).toFloat(),
