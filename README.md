@@ -119,6 +119,54 @@ As a widget
 		/>
 ```
 
+## Testing
+
+This library includes comprehensive snapshot testing using [Roborazzi](https://github.com/takahirom/roborazzi) and the official Android Compose screenshot testing approach to ensure UI consistency:
+
+- ✅ **~50 snapshot tests** covering all UI components
+- ✅ **Multiple device types** (phones, tablets, various screen densities)
+- ✅ **RTL support** (Arabic, Hebrew)
+- ✅ **Light and dark themes** Material3 themes
+- ✅ **Automated CI/CD** with GitHub Actions
+- ✅ **PR-based snapshot updates** via `/record-snapshots` command
+
+### Running Tests
+
+```bash
+# Record reference snapshots
+./gradlew :library:recordSnapshots
+
+# Verify snapshots match
+./gradlew :library:verifySnapshots
+
+# Generate snapshot report
+./gradlew :library:snapshotReport
+```
+
+### Updating Snapshots in PRs
+
+When snapshot tests fail in a PR and changes are intentional, simply comment:
+```
+/record-snapshots
+```
+
+GitHub Actions will automatically record and commit new snapshots to your PR!
+
+For detailed testing documentation, see [library/SNAPSHOT_TESTING.md](library/SNAPSHOT_TESTING.md).
+
+## Development
+
+### Snapshot Testing
+
+The library uses Roborazzi for snapshot testing to prevent visual regressions. All UI components are tested across multiple configurations using JVM-based tests (no emulator required).
+
+**Test Coverage:**
+- Component Tests (~25): Individual UI elements (ColorWheel, Sliders, PreviewBox)
+- ColorPicker Tests (~10): Full picker configurations
+- Dialog & Config Tests (~15): Dialogs, preferences, devices, themes, locales
+
+See the [Snapshot Testing Guide](library/SNAPSHOT_TESTING.md) for more information.
+
 ## To do
 
 * gradle support
