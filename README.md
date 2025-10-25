@@ -121,13 +121,14 @@ As a widget
 
 ## Testing
 
-This library includes comprehensive snapshot testing using [Paparazzi](https://github.com/cashapp/paparazzi) to ensure UI consistency across:
+This library includes comprehensive snapshot testing using [Roborazzi](https://github.com/takahirom/roborazzi) and the official Android Compose screenshot testing approach to ensure UI consistency:
 
-- ✅ **~110+ snapshot tests** covering all UI components
+- ✅ **~50 snapshot tests** covering all UI components
 - ✅ **Multiple device types** (phones, tablets, various screen densities)
-- ✅ **14 languages** including RTL support (Arabic, Hebrew)
-- ✅ **Light and dark themes** plus custom Material3 themes
+- ✅ **RTL support** (Arabic, Hebrew)
+- ✅ **Light and dark themes** Material3 themes
 - ✅ **Automated CI/CD** with GitHub Actions
+- ✅ **PR-based snapshot updates** via `/record-snapshots` command
 
 ### Running Tests
 
@@ -142,21 +143,27 @@ This library includes comprehensive snapshot testing using [Paparazzi](https://g
 ./gradlew :library:snapshotReport
 ```
 
+### Updating Snapshots in PRs
+
+When snapshot tests fail in a PR and changes are intentional, simply comment:
+```
+/record-snapshots
+```
+
+GitHub Actions will automatically record and commit new snapshots to your PR!
+
 For detailed testing documentation, see [library/SNAPSHOT_TESTING.md](library/SNAPSHOT_TESTING.md).
 
 ## Development
 
 ### Snapshot Testing
 
-The library uses snapshot testing to prevent visual regressions. All UI components are tested across multiple configurations to ensure consistent rendering.
+The library uses Roborazzi for snapshot testing to prevent visual regressions. All UI components are tested across multiple configurations using JVM-based tests (no emulator required).
 
 **Test Coverage:**
-- Component Tests (~35): Individual UI elements
-- ColorPicker Tests (~15): Full picker configurations
-- Dialog Tests (~15): Dialogs and preferences
-- Device Tests (~20): Multiple devices and orientations
-- Locale Tests (~14): Language and RTL support
-- Theme Tests (~12): Material3 theme variations
+- Component Tests (~25): Individual UI elements (ColorWheel, Sliders, PreviewBox)
+- ColorPicker Tests (~10): Full picker configurations
+- Dialog & Config Tests (~15): Dialogs, preferences, devices, themes, locales
 
 See the [Snapshot Testing Guide](library/SNAPSHOT_TESTING.md) for more information.
 

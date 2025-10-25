@@ -33,7 +33,7 @@ google-services.json
 # Android Profiling
 *.hprof
 
-# Snapshot testing artifacts
-library/out/
-library/src/test/snapshots-compare/
-*.png_compare
+# Roborazzi snapshot testing artifacts (keep reference snapshots, ignore comparisons)
+**/build/outputs/roborazzi/
+**/*_compare.png
+**/*_actual.png

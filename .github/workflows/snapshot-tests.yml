@@ -11,11 +11,134 @@ on:
     paths:
       - 'library/**'
       - '.github/workflows/snapshot-tests.yml'
+  issue_comment:
+    types: [created]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
-  snapshot-tests:
-    name: Run Snapshot Tests
+  # Check if comment is a snapshot command
+  check-command:
+    if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    outputs:
+      should-record: ${{ steps.check.outputs.should-record }}
+      pr-number: ${{ steps.pr.outputs.number }}
+      pr-ref: ${{ steps.pr.outputs.ref }}
+    steps:
+      - name: Check for record command
+        id: check
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          if [[ "$COMMENT" == "/record-snapshots" ]] || [[ "$COMMENT" == "/update-snapshots" ]]; then
+            echo "should-record=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-record=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get PR info
+        if: steps.check.outputs.should-record == 'true'
+        id: pr
+        run: |
+          PR_NUMBER=${{ github.event.issue.number }}
+          PR_DATA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}")
+          PR_REF=$(echo "$PR_DATA" | jq -r .head.ref)
+          echo "number=${PR_NUMBER}" >> $GITHUB_OUTPUT
+          echo "ref=${PR_REF}" >> $GITHUB_OUTPUT
+
+      - name: React to comment
+        if: steps.check.outputs.should-record == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ github.event.comment.id }},
+              content: 'rocket'
+            });
+
+  # Record and commit snapshots (triggered by comment)
+  record-snapshots:
+    needs: check-command
+    if: needs.check-command.outputs.should-record == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check-command.outputs.pr-ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Record snapshots
+        run: |
+          echo "Recording snapshots..."
+          ./gradlew :library:recordRoborazziDebug --no-daemon --stacktrace
+
+      - name: Check for changes
+        id: check-changes
+        run: |
+          if git diff --quiet; then
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+            echo "No snapshot changes detected"
+          else
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+            echo "Snapshot changes detected"
+          fi
+
+      - name: Commit and push snapshots
+        if: steps.check-changes.outputs.has-changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add library/src/test/resources/roborazzi/
+          git commit -m "Update snapshot tests
+
+          🤖 Snapshots updated via GitHub Actions
+
+          Triggered by: @${{ github.event.comment.user.login }}
+          PR: #${{ needs.check-command.outputs.pr-number }}"
+          git push
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const hasChanges = '${{ steps.check-changes.outputs.has-changes }}' === 'true';
+            const body = hasChanges
+              ? `✅ Snapshots have been recorded and committed to this PR!\n\nThe reference snapshots have been updated. You can now push additional changes and the CI will verify against these new baselines.`
+              : `ℹ️ No snapshot changes detected.\n\nAll snapshots match the current code. No updates were necessary.`;
+
+            await github.rest.issues.createComment({
+              issue_number: ${{ needs.check-command.outputs.pr-number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  # Verify snapshots (triggered by PR/push)
+  verify-snapshots:
+    if: github.event_name != 'issue_comment'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -45,104 +168,101 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Run snapshot tests
-        id: snapshot_tests
+      - name: Run snapshot verification
+        id: verify
         continue-on-error: true
         run: |
           echo "Running snapshot verification..."
-          ./gradlew :library:verifyPaparazziDebug --no-daemon --stacktrace
+          ./gradlew :library:verifyRoborazziDebug --no-daemon --stacktrace
 
       - name: Check for snapshot failures
-        id: check_failures
+        id: check-failures
         if: always()
         run: |
-          # Check if there are any failure images
-          FAILURE_DIR="library/out/failures"
-          if [ -d "$FAILURE_DIR" ] && [ "$(ls -A $FAILURE_DIR)" ]; then
-            echo "has_failures=true" >> $GITHUB_OUTPUT
+          # Check for failure images
+          FAILURE_DIR="library/build/outputs/roborazzi"
+          if [ -d "$FAILURE_DIR" ] && find "$FAILURE_DIR" -name "*_compare.png" -o -name "*_actual.png" | grep -q .; then
+            echo "has-failures=true" >> $GITHUB_OUTPUT
             echo "❌ Snapshot tests failed - visual differences detected"
 
             # Count failures
-            FAILURE_COUNT=$(find $FAILURE_DIR -name "*.png" | wc -l)
-            echo "failure_count=$FAILURE_COUNT" >> $GITHUB_OUTPUT
-            echo "Total failures: $FAILURE_COUNT"
-
-            # List all failures
-            echo ""
-            echo "Failed snapshots:"
-            find $FAILURE_DIR -name "*.png" | while read file; do
-              basename "$file"
-            done
+            FAILURE_COUNT=$(find "$FAILURE_DIR" -name "*_compare.png" -o -name "*_actual.png" | wc -l)
+            echo "failure-count=$FAILURE_COUNT" >> $GITHUB_OUTPUT
+            echo "Total failure images: $FAILURE_COUNT"
           else
-            echo "has_failures=false" >> $GITHUB_OUTPUT
+            echo "has-failures=false" >> $GITHUB_OUTPUT
             echo "✅ All snapshot tests passed!"
           fi
 
       - name: Upload snapshot failure report
-        if: always() && steps.check_failures.outputs.has_failures == 'true'
+        if: always() && steps.check-failures.outputs.has-failures == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: snapshot-test-failures
           path: |
-            library/out/failures/
-            library/build/reports/paparazzi/
+            library/build/outputs/roborazzi/
           retention-days: 30
-
-      - name: Upload snapshot verification report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: snapshot-test-report
-          path: |
-            library/build/reports/paparazzi/
-          retention-days: 7
 
       - name: Comment PR with failure summary
         if: |
           always() &&
           github.event_name == 'pull_request' &&
-          steps.check_failures.outputs.has_failures == 'true'
+          steps.check-failures.outputs.has-failures == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-            const path = require('path');
-
-            const failureDir = 'library/out/failures';
-            const failureCount = '${{ steps.check_failures.outputs.failure_count }}';
-
-            let failures = [];
-            if (fs.existsSync(failureDir)) {
-              failures = fs.readdirSync(failureDir)
-                .filter(f => f.endsWith('.png'))
-                .map(f => `- \`${f}\``)
-                .join('\n');
-            }
+            const failureCount = '${{ steps.check-failures.outputs.failure-count }}';
 
             const body = `## ❌ Snapshot Tests Failed
 
-            **Total failures:** ${failureCount}
-
-            ### Failed Snapshots
-            ${failures}
+            **Total failures:** ${failureCount} mismatched images
 
             ### What to do next:
 
-            1. **Download the failure artifacts** from this workflow run
-            2. **Review the visual differences** in the failure images
-            3. **If changes are intentional:**
-               - Run \`./gradlew :library:recordSnapshots\` locally
-               - Commit the updated snapshots
-               - Push the changes
-            4. **If changes are unintentional:**
-               - Fix the UI regression
-               - Verify tests pass locally with \`./gradlew :library:verifySnapshots\`
+            **Option 1: Update snapshots if changes are intentional**
+            Comment \`/record-snapshots\` or \`/update-snapshots\` on this PR to automatically record and commit new snapshots.
+
+            **Option 2: Fix the regression**
+            1. Download the [failure artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) to see the differences
+            2. Fix the unintended visual changes
+            3. Push the changes and the CI will re-verify
+
+            **Option 3: Update locally**
+            \`\`\`bash
+            ./gradlew :library:recordSnapshots
+            git add library/src/test/resources/roborazzi/
+            git commit -m "Update snapshots"
+            git push
+            \`\`\`
 
             ### Artifacts
-            - [Download snapshot failure report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [Download snapshot comparison images](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
-            📖 See [SNAPSHOT_TESTING.md](./library/SNAPSHOT_TESTING.md) for more information.
+            📖 See [library/SNAPSHOT_TESTING.md](./library/SNAPSHOT_TESTING.md) for more information.
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Comment PR with success
+        if: |
+          always() &&
+          github.event_name == 'pull_request' &&
+          steps.check-failures.outputs.has-failures == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const body = `## ✅ Snapshot Tests Passed
+
+            All snapshot tests passed successfully! No visual regressions detected.
+
+            📸 All UI components render correctly across all tested configurations.
             `;
 
             github.rest.issues.createComment({
@@ -158,16 +278,14 @@ jobs:
           echo "## Snapshot Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [ "${{ steps.check_failures.outputs.has_failures }}" == "true" ]; then
+          if [ "${{ steps.check-failures.outputs.has-failures }}" == "true" ]; then
             echo "❌ **Status:** FAILED" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Failures:** ${{ steps.check_failures.outputs.failure_count }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Failures:** ${{ steps.check-failures.outputs.failure-count }} images" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### Failed Snapshots" >> $GITHUB_STEP_SUMMARY
+            echo "### How to fix" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            find library/out/failures -name "*.png" | xargs -I {} basename {} >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "Comment \`/record-snapshots\` on this PR to update snapshots automatically." >> $GITHUB_STEP_SUMMARY
           else
             echo "✅ **Status:** PASSED" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -175,98 +293,7 @@ jobs:
           fi
 
       - name: Fail workflow if snapshots don't match
-        if: steps.check_failures.outputs.has_failures == 'true'
+        if: steps.check-failures.outputs.has-failures == 'true'
         run: |
-          echo "::error::Snapshot tests failed with ${{ steps.check_failures.outputs.failure_count }} differences"
+          echo "::error::Snapshot tests failed with ${{ steps.check-failures.outputs.failure-count }} differences"
           exit 1
-
-  snapshot-comparison:
-    name: Snapshot Comparison Report
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: snapshot-tests
-    if: always() && github.event_name == 'pull_request'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Generate snapshot report
-        run: |
-          # Try to generate the snapshot report
-          if ./gradlew :library:snapshotReport --no-daemon 2>&1 | tee report.txt; then
-            echo "Report generated successfully"
-          else
-            echo "No snapshots found or report generation failed"
-            echo "This is expected if snapshots haven't been recorded yet."
-          fi
-
-      - name: Comment PR with snapshot statistics
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-
-            let reportContent = '';
-            if (fs.existsSync('report.txt')) {
-              reportContent = fs.readFileSync('report.txt', 'utf8');
-            }
-
-            const body = `## 📊 Snapshot Test Coverage
-
-            ${reportContent ? '```\n' + reportContent + '\n```' : 'No snapshot report available yet. Run `./gradlew :library:recordSnapshots` to generate reference snapshots.'}
-
-            ### Test Categories
-
-            - ✅ **Component Tests** (~35 tests): Individual UI components (ColorWheel, Sliders, PreviewBox)
-            - ✅ **ColorPicker Tests** (~15 tests): Full ColorPicker with various configurations
-            - ✅ **Dialog Tests** (~15 tests): Dialogs and preference items
-            - ✅ **Device Tests** (~20 tests): Multiple devices, orientations, and DPIs
-            - ✅ **Locale Tests** (~14 tests): 14 languages including RTL support
-            - ✅ **Theme Tests** (~12 tests): Light, dark, and custom themes
-
-            **Total Coverage:** ~110+ snapshot tests
-
-            📖 See [SNAPSHOT_TESTING.md](./library/SNAPSHOT_TESTING.md) for details.
-            `;
-
-            // Check if comment already exists
-            const comments = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-
-            const existingComment = comments.data.find(
-              comment => comment.body.includes('📊 Snapshot Test Coverage')
-            );
-
-            if (existingComment) {
-              // Update existing comment
-              await github.rest.issues.updateComment({
-                comment_id: existingComment.id,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: body
-              });
-            } else {
-              // Create new comment
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: body
-              });
-            }
