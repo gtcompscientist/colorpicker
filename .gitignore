@@ -32,3 +32,8 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Snapshot testing artifacts
+library/out/
+library/src/test/snapshots-compare/
+*.png_compare

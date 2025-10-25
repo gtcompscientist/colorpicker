@@ -119,6 +119,47 @@ As a widget
 		/>
 ```
 
+## Testing
+
+This library includes comprehensive snapshot testing using [Paparazzi](https://github.com/cashapp/paparazzi) to ensure UI consistency across:
+
+- ✅ **~110+ snapshot tests** covering all UI components
+- ✅ **Multiple device types** (phones, tablets, various screen densities)
+- ✅ **14 languages** including RTL support (Arabic, Hebrew)
+- ✅ **Light and dark themes** plus custom Material3 themes
+- ✅ **Automated CI/CD** with GitHub Actions
+
+### Running Tests
+
+```bash
+# Record reference snapshots
+./gradlew :library:recordSnapshots
+
+# Verify snapshots match
+./gradlew :library:verifySnapshots
+
+# Generate snapshot report
+./gradlew :library:snapshotReport
+```
+
+For detailed testing documentation, see [library/SNAPSHOT_TESTING.md](library/SNAPSHOT_TESTING.md).
+
+## Development
+
+### Snapshot Testing
+
+The library uses snapshot testing to prevent visual regressions. All UI components are tested across multiple configurations to ensure consistent rendering.
+
+**Test Coverage:**
+- Component Tests (~35): Individual UI elements
+- ColorPicker Tests (~15): Full picker configurations
+- Dialog Tests (~15): Dialogs and preferences
+- Device Tests (~20): Multiple devices and orientations
+- Locale Tests (~14): Language and RTL support
+- Theme Tests (~12): Material3 theme variations
+
+See the [Snapshot Testing Guide](library/SNAPSHOT_TESTING.md) for more information.
+
 ## To do
 
 * gradle support
