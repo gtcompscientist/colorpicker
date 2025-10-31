@@ -27,21 +27,27 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       should-record: ${{ steps.check.outputs.should-record }}
+      should-verify: ${{ steps.check.outputs.should-verify }}
       pr-number: ${{ steps.pr.outputs.number }}
       pr-ref: ${{ steps.pr.outputs.ref }}
     steps:
-      - name: Check for record command
+      - name: Check for snapshot commands
         id: check
         run: |
           COMMENT="${{ github.event.comment.body }}"
           if [[ "$COMMENT" == "/record-snapshots" ]] || [[ "$COMMENT" == "/update-snapshots" ]]; then
             echo "should-record=true" >> $GITHUB_OUTPUT
+            echo "should-verify=false" >> $GITHUB_OUTPUT
+          elif [[ "$COMMENT" == "/verify-snapshots" ]]; then
+            echo "should-record=false" >> $GITHUB_OUTPUT
+            echo "should-verify=true" >> $GITHUB_OUTPUT
           else
             echo "should-record=false" >> $GITHUB_OUTPUT
+            echo "should-verify=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Get PR info
-        if: steps.check.outputs.should-record == 'true'
+        if: steps.check.outputs.should-record == 'true' || steps.check.outputs.should-verify == 'true'
         id: pr
         run: |
           PR_NUMBER=${{ github.event.issue.number }}
@@ -52,7 +58,7 @@ jobs:
           echo "ref=${PR_REF}" >> $GITHUB_OUTPUT
 
       - name: React to comment
-        if: steps.check.outputs.should-record == 'true'
+        if: steps.check.outputs.should-record == 'true' || steps.check.outputs.should-verify == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -128,6 +134,119 @@ jobs:
             const body = hasChanges
               ? `✅ Snapshots have been recorded and committed to this PR!\n\nThe reference snapshots have been updated. You can now push additional changes and the CI will verify against these new baselines.`
               : `ℹ️ No snapshot changes detected.\n\nAll snapshots match the current code. No updates were necessary.`;
+
+            await github.rest.issues.createComment({
+              issue_number: ${{ needs.check-command.outputs.pr-number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  # Verify snapshots on command (triggered by PR comment)
+  verify-snapshots-on-command:
+    needs: check-command
+    if: needs.check-command.outputs.should-verify == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check-command.outputs.pr-ref }}
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run snapshot verification
+        id: verify
+        continue-on-error: true
+        run: |
+          echo "Running snapshot verification..."
+          ./gradlew :library:verifyRoborazziDebug --no-daemon --stacktrace
+
+      - name: Check for snapshot failures
+        id: check-failures
+        if: always()
+        run: |
+          # Check for failure images
+          FAILURE_DIR="library/build/outputs/roborazzi"
+          if [ -d "$FAILURE_DIR" ] && find "$FAILURE_DIR" -name "*_compare.png" -o -name "*_actual.png" | grep -q .; then
+            echo "has-failures=true" >> $GITHUB_OUTPUT
+            echo "❌ Snapshot tests failed - visual differences detected"
+
+            # Count failures
+            FAILURE_COUNT=$(find "$FAILURE_DIR" -name "*_compare.png" -o -name "*_actual.png" | wc -l)
+            echo "failure-count=$FAILURE_COUNT" >> $GITHUB_OUTPUT
+            echo "Total failure images: $FAILURE_COUNT"
+          else
+            echo "has-failures=false" >> $GITHUB_OUTPUT
+            echo "✅ All snapshot tests passed!"
+          fi
+
+      - name: Upload snapshot failure report
+        if: always() && steps.check-failures.outputs.has-failures == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-test-failures-manual-verify
+          path: |
+            library/build/outputs/roborazzi/
+          retention-days: 30
+
+      - name: Comment on PR with results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const hasFailures = '${{ steps.check-failures.outputs.has-failures }}' === 'true';
+            const failureCount = '${{ steps.check-failures.outputs.failure-count }}';
+
+            let body;
+            if (hasFailures) {
+              body = `## ❌ Snapshot Verification Failed
+
+            **Total failures:** ${failureCount} mismatched images
+
+            ### What to do next:
+
+            **Option 1: Update snapshots if changes are intentional**
+            Comment \`/record-snapshots\` or \`/update-snapshots\` on this PR to automatically record and commit new snapshots.
+
+            **Option 2: Fix the regression**
+            1. Download the [failure artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) to see the differences
+            2. Fix the unintended visual changes
+            3. Push the changes and run \`/verify-snapshots\` again
+
+            **Option 3: Update locally**
+            \`\`\`bash
+            ./gradlew :library:recordSnapshots
+            git add library/src/test/resources/roborazzi/
+            git commit -m "Update snapshots"
+            git push
+            \`\`\`
+
+            ### Artifacts
+            - [Download snapshot comparison images](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            📖 See [library/SNAPSHOT_TESTING.md](./library/SNAPSHOT_TESTING.md) for more information.
+            `;
+            } else {
+              body = `## ✅ Snapshot Verification Passed
+
+            All snapshot tests passed successfully! No visual regressions detected.
+
+            📸 All UI components render correctly across all tested configurations.
+            `;
+            }
 
             await github.rest.issues.createComment({
               issue_number: ${{ needs.check-command.outputs.pr-number }},
