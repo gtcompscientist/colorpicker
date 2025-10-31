@@ -1,0 +1,213 @@
+name: Unit Tests
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '**.gradle'
+      - 'gradle/**'
+      - '.github/workflows/unit-tests.yml'
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '**.gradle'
+      - 'gradle/**'
+      - '.github/workflows/unit-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Run unit tests on library
+        id: test-library
+        continue-on-error: true
+        run: |
+          echo "Running unit tests on library module..."
+          ./gradlew :library:testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Run unit tests on app
+        id: test-app
+        continue-on-error: true
+        run: |
+          echo "Running unit tests on app module..."
+          ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Publish test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: |
+            library/build/test-results/**/*.xml
+            app/build/test-results/**/*.xml
+          check_name: Unit Test Results
+          comment_mode: always
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            library/build/reports/tests/
+            app/build/reports/tests/
+            library/build/test-results/
+            app/build/test-results/
+          retention-days: 30
+
+      - name: Check test results
+        id: check-results
+        if: always()
+        run: |
+          LIBRARY_STATUS="${{ steps.test-library.outcome }}"
+          APP_STATUS="${{ steps.test-app.outcome }}"
+
+          echo "Library tests: $LIBRARY_STATUS"
+          echo "App tests: $APP_STATUS"
+
+          # Count test failures
+          LIBRARY_FAILURES=0
+          APP_FAILURES=0
+
+          if [ -d "library/build/test-results/testDebugUnitTest" ]; then
+            LIBRARY_FAILURES=$(find library/build/test-results/testDebugUnitTest -name "*.xml" -exec grep -l 'failures="[1-9]' {} \; | wc -l || echo 0)
+          fi
+
+          if [ -d "app/build/test-results/testDebugUnitTest" ]; then
+            APP_FAILURES=$(find app/build/test-results/testDebugUnitTest -name "*.xml" -exec grep -l 'failures="[1-9]' {} \; | wc -l || echo 0)
+          fi
+
+          echo "library-failures=$LIBRARY_FAILURES" >> $GITHUB_OUTPUT
+          echo "app-failures=$APP_FAILURES" >> $GITHUB_OUTPUT
+
+          if [[ "$LIBRARY_STATUS" == "failure" ]] || [[ "$APP_STATUS" == "failure" ]]; then
+            echo "has-failures=true" >> $GITHUB_OUTPUT
+            echo "Unit tests failed"
+          else
+            echo "has-failures=false" >> $GITHUB_OUTPUT
+            echo "All unit tests passed"
+          fi
+
+      - name: Comment PR with results
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const hasFailures = '${{ steps.check-results.outputs.has-failures }}' === 'true';
+            const libraryStatus = '${{ steps.test-library.outcome }}';
+            const appStatus = '${{ steps.test-app.outcome }}';
+
+            const statusEmoji = (status) => status === 'success' ? '✅' : '❌';
+
+            let body;
+            if (hasFailures) {
+              body = `## ❌ Unit Tests Failed
+
+            **Results:**
+            - Library: ${statusEmoji(libraryStatus)} ${libraryStatus}
+            - App: ${statusEmoji(appStatus)} ${appStatus}
+
+            ### What to do next:
+
+            1. Download the [test reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) to see detailed failures
+            2. Fix the failing tests or the code causing test failures
+            3. Run locally to verify: \`./gradlew test\`
+            4. Push the fixes
+
+            **Local commands:**
+            \`\`\`bash
+            # Run all unit tests
+            ./gradlew test
+
+            # Run tests for specific module
+            ./gradlew :library:testDebugUnitTest
+            ./gradlew :app:testDebugUnitTest
+
+            # Run tests with detailed output
+            ./gradlew test --info
+            \`\`\`
+
+            ### Artifacts
+            - [Download test reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+            } else {
+              body = `## ✅ Unit Tests Passed
+
+            **Results:**
+            - Library: ${statusEmoji(libraryStatus)} ${libraryStatus}
+            - App: ${statusEmoji(appStatus)} ${appStatus}
+
+            All unit tests passed successfully!
+            `;
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "## Unit Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check-results.outputs.has-failures }}" == "true" ]; then
+            echo "❌ **Status:** FAILED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Module Results:**" >> $GITHUB_STEP_SUMMARY
+            echo "- Library: ${{ steps.test-library.outcome }}" >> $GITHUB_STEP_SUMMARY
+            echo "- App: ${{ steps.test-app.outcome }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Check the test reports artifact for detailed failure information." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **Status:** PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "All modules passed unit tests!" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail workflow if tests failed
+        if: steps.check-results.outputs.has-failures == 'true'
+        run: |
+          echo "::error::Unit tests failed"
+          exit 1

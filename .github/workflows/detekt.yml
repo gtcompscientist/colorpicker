@@ -1,0 +1,176 @@
+name: Detekt
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - 'config/detekt/**'
+      - '.github/workflows/detekt.yml'
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - 'config/detekt/**'
+      - '.github/workflows/detekt.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  detekt:
+    name: Detekt Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Run detekt on library
+        id: detekt-library
+        continue-on-error: true
+        run: |
+          echo "Running detekt on library module..."
+          ./gradlew :library:detekt --no-daemon --stacktrace
+
+      - name: Run detekt on app
+        id: detekt-app
+        continue-on-error: true
+        run: |
+          echo "Running detekt on app module..."
+          ./gradlew :app:detekt --no-daemon --stacktrace
+
+      - name: Upload detekt reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-reports
+          path: |
+            library/build/reports/detekt/
+            app/build/reports/detekt/
+          retention-days: 30
+
+      - name: Check detekt results
+        id: check-results
+        if: always()
+        run: |
+          LIBRARY_STATUS="${{ steps.detekt-library.outcome }}"
+          APP_STATUS="${{ steps.detekt-app.outcome }}"
+
+          if [[ "$LIBRARY_STATUS" == "failure" ]] || [[ "$APP_STATUS" == "failure" ]]; then
+            echo "has-failures=true" >> $GITHUB_OUTPUT
+            echo "Detekt found issues"
+          else
+            echo "has-failures=false" >> $GITHUB_OUTPUT
+            echo "Detekt passed"
+          fi
+
+      - name: Comment PR with results
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const hasFailures = '${{ steps.check-results.outputs.has-failures }}' === 'true';
+            const libraryStatus = '${{ steps.detekt-library.outcome }}';
+            const appStatus = '${{ steps.detekt-app.outcome }}';
+
+            const statusEmoji = (status) => status === 'success' ? '✅' : '❌';
+
+            let body;
+            if (hasFailures) {
+              body = `## ❌ Detekt Analysis Failed
+
+            **Results:**
+            - Library: ${statusEmoji(libraryStatus)} ${libraryStatus}
+            - App: ${statusEmoji(appStatus)} ${appStatus}
+
+            ### What to do next:
+
+            1. Download the [detekt reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) to see detailed issues
+            2. Fix the code style and quality issues
+            3. Run locally to verify: \`./gradlew detekt\`
+            4. Push the fixes
+
+            **Local commands:**
+            \`\`\`bash
+            # Run detekt on all modules
+            ./gradlew detekt
+
+            # Run detekt with auto-correct (when possible)
+            ./gradlew detektApply
+            \`\`\`
+
+            ### Artifacts
+            - [Download detekt reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+            } else {
+              body = `## ✅ Detekt Analysis Passed
+
+            **Results:**
+            - Library: ${statusEmoji(libraryStatus)} ${libraryStatus}
+            - App: ${statusEmoji(appStatus)} ${appStatus}
+
+            All code quality checks passed! No issues detected.
+            `;
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Generate detekt summary
+        if: always()
+        run: |
+          echo "## Detekt Analysis Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check-results.outputs.has-failures }}" == "true" ]; then
+            echo "❌ **Status:** FAILED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Module Results:**" >> $GITHUB_STEP_SUMMARY
+            echo "- Library: ${{ steps.detekt-library.outcome }}" >> $GITHUB_STEP_SUMMARY
+            echo "- App: ${{ steps.detekt-app.outcome }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`./gradlew detekt\` locally to see detailed issues." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **Status:** PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "All modules passed detekt checks!" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail workflow if detekt found issues
+        if: steps.check-results.outputs.has-failures == 'true'
+        run: |
+          echo "::error::Detekt found code quality issues"
+          exit 1
