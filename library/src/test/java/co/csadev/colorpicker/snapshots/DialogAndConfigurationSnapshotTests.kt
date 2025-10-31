@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onRoot
 import co.csadev.colorpicker.compose.ColorPickerDialog
 import co.csadev.colorpicker.compose.ColorPickerPreferenceItem
 import co.csadev.colorpicker.state.ColorPickerState
