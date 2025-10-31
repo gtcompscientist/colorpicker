@@ -59,7 +59,7 @@ class DialogAndConfigurationSnapshotTests {
                 )
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -81,7 +81,7 @@ class DialogAndConfigurationSnapshotTests {
                 )
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -103,7 +103,7 @@ class DialogAndConfigurationSnapshotTests {
                 )
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     // ========== Preference Item Tests ==========
@@ -127,7 +127,7 @@ class DialogAndConfigurationSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -149,7 +149,7 @@ class DialogAndConfigurationSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -182,7 +182,7 @@ class DialogAndConfigurationSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     // ========== Theme Tests ==========
@@ -208,7 +208,7 @@ class DialogAndConfigurationSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -229,7 +229,7 @@ class DialogAndConfigurationSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     // ========== Device Configuration Tests ==========
@@ -253,7 +253,7 @@ class DialogAndConfigurationSnapshotTests {
                 )
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -275,7 +275,7 @@ class DialogAndConfigurationSnapshotTests {
                 )
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -297,7 +297,7 @@ class DialogAndConfigurationSnapshotTests {
                 )
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     // ========== Locale Tests (RTL) ==========
@@ -321,7 +321,7 @@ class DialogAndConfigurationSnapshotTests {
                 )
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -343,7 +343,7 @@ class DialogAndConfigurationSnapshotTests {
                 )
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 }
 
