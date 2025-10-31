@@ -110,20 +110,27 @@ On every PR and push to main branches, the GitHub Actions workflow:
 
 ### PR Comment Commands
 
-You can control snapshot updates directly from PR comments:
+You can control snapshot testing directly from PR comments:
 
 | Command | Description |
 |---------|-------------|
 | `/record-snapshots` | Records new snapshots and commits to PR |
 | `/update-snapshots` | Alias for `/record-snapshots` |
+| `/verify-snapshots` | Manually re-runs snapshot verification on PR |
 
-**Example workflow:**
+**Example workflow for updating snapshots:**
 1. Make UI changes and push to PR
 2. Snapshot tests fail in CI
 3. Review the failure artifacts
 4. If changes are intentional, comment `/record-snapshots`
 5. GitHub Actions records and commits new snapshots
 6. Tests pass on next run!
+
+**Example workflow for re-verification:**
+1. Snapshot tests fail in CI
+2. You push a fix to the PR
+3. Comment `/verify-snapshots` to immediately re-run tests
+4. Get instant feedback without waiting for the next push event
 
 ## Adding New Snapshot Tests
 
@@ -225,8 +232,10 @@ git push
 - Uncommitted snapshot changes
 - Graphics mode mismatch
 
-**Solution:**
-Ensure you're using JDK 17 both locally and in CI.
+**Solutions:**
+1. Ensure you're using JDK 17 both locally and in CI
+2. Verify snapshots are committed: `git status`
+3. Re-run verification in CI: Comment `/verify-snapshots` on the PR
 
 ### Can't Find Snapshot Images
 

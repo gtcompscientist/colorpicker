@@ -54,7 +54,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -74,7 +74,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -94,7 +94,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -114,7 +114,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -134,7 +134,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -154,7 +154,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -174,7 +174,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -194,7 +194,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -214,7 +214,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -234,7 +234,7 @@ class ColorPickerSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 }
 

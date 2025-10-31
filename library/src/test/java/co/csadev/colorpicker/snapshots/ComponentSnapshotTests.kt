@@ -61,7 +61,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -78,7 +78,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -95,7 +95,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -112,7 +112,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -129,7 +129,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -146,7 +146,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -163,7 +163,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -180,7 +180,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -197,7 +197,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -214,7 +214,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     // ========== Slider Tests ==========
@@ -226,14 +226,14 @@ class ComponentSnapshotTests {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     LightnessSlider(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
-                        currentColor = Color.Red,
+                        color = Color.Red,
                         lightness = 1f,
                         onLightnessChange = {}
                     )
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -243,14 +243,14 @@ class ComponentSnapshotTests {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     LightnessSlider(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
-                        currentColor = Color.Blue,
+                        color = Color.Blue,
                         lightness = 0.5f,
                         onLightnessChange = {}
                     )
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -260,14 +260,14 @@ class ComponentSnapshotTests {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     LightnessSlider(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
-                        currentColor = Color.Green,
+                        color = Color.Green,
                         lightness = 0.2f,
                         onLightnessChange = {}
                     )
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -277,14 +277,14 @@ class ComponentSnapshotTests {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     LightnessSlider(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
-                        currentColor = Color(0xFFFF9800),
+                        color = Color(0xFFFF9800),
                         lightness = 0.7f,
                         onLightnessChange = {}
                     )
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -294,14 +294,14 @@ class ComponentSnapshotTests {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     AlphaSlider(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
-                        currentColor = Color.Red,
+                        color = Color.Red,
                         alpha = 1f,
                         onAlphaChange = {}
                     )
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -311,14 +311,14 @@ class ComponentSnapshotTests {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     AlphaSlider(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
-                        currentColor = Color.Blue,
+                        color = Color.Blue,
                         alpha = 0.5f,
                         onAlphaChange = {}
                     )
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -328,14 +328,14 @@ class ComponentSnapshotTests {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     AlphaSlider(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
-                        currentColor = Color.Green,
+                        color = Color.Green,
                         alpha = 0.2f,
                         onAlphaChange = {}
                     )
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -345,14 +345,14 @@ class ComponentSnapshotTests {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     AlphaSlider(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
-                        currentColor = Color.Magenta,
+                        color = Color.Magenta,
                         alpha = 0.8f,
                         onAlphaChange = {}
                     )
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     // ========== ColorPreviewBox Tests ==========
@@ -366,7 +366,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -378,7 +378,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -390,7 +390,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -402,7 +402,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -414,7 +414,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -426,7 +426,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 
     @Test
@@ -438,7 +438,7 @@ class ComponentSnapshotTests {
                 }
             }
         }
-        captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage()
     }
 }
 
