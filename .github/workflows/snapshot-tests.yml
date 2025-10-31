@@ -106,7 +106,7 @@ jobs:
       - name: Record snapshots
         run: |
           echo "Recording snapshots..."
-          ./gradlew :library:recordRoborazziDebug --no-daemon --stacktrace
+          ./gradlew :library:recordSnapshots --no-daemon --stacktrace
 
       - name: Check for changes
         id: check-changes
@@ -179,7 +179,7 @@ jobs:
         continue-on-error: true
         run: |
           echo "Running snapshot verification..."
-          ./gradlew :library:verifyRoborazziDebug --no-daemon --stacktrace
+          ./gradlew :library:verifySnapshots --no-daemon --stacktrace
 
       - name: Check for snapshot failures
         id: check-failures
@@ -300,7 +300,7 @@ jobs:
         continue-on-error: true
         run: |
           echo "Running snapshot verification..."
-          ./gradlew :library:verifyRoborazziDebug --no-daemon --stacktrace
+          ./gradlew :library:verifySnapshots --no-daemon --stacktrace
 
       - name: Check for snapshot failures
         id: check-failures

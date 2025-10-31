@@ -34,7 +34,8 @@ A modern, Compose-first Android color picker library with interactive color whee
 - **Multiple Wheel Types** - Flower (organic) and Circle (precise) rendering styles
 - **Complete Customization** - Alpha, lightness, density, colors all configurable
 - **Dialog & Preference Support** - Ready-to-use dialog and DataStore integration
-- **Comprehensive Testing** - 50+ snapshot tests with Roborazzi
+- **Comprehensive Testing** - 50+ snapshot tests with Roborazzi and automated CI/CD
+- **PR-Based Snapshot Updates** - Update visual baselines via `/record-snapshots` comment
 - **RTL Support** - Right-to-left layout support
 - **Accessibility** - Full semantic annotations for screen readers
 
@@ -286,9 +287,9 @@ This library includes comprehensive snapshot testing using [Roborazzi](https://g
 - ✅ **RTL support** (Arabic, Hebrew)
 - ✅ **Light and dark themes** Material3 themes
 - ✅ **Automated CI/CD** with GitHub Actions
-- ✅ **PR-based snapshot updates** via `/record-snapshots` command
+- ✅ **PR-based snapshot updates** via comment commands
 
-### Running Tests
+### Running Tests Locally
 
 ```bash
 # Record reference snapshots
@@ -297,18 +298,67 @@ This library includes comprehensive snapshot testing using [Roborazzi](https://g
 # Verify snapshots match
 ./gradlew :library:verifySnapshots
 
+# Compare snapshots (generates comparison images)
+./gradlew :library:compareSnapshots
+
+# Clean snapshot artifacts
+./gradlew :library:cleanSnapshots
+
 # Generate snapshot report
 ./gradlew :library:snapshotReport
 ```
 
-### Updating Snapshots in PRs
+### GitHub Actions Integration
 
-When snapshot tests fail in a PR and changes are intentional, simply comment:
+The library includes automated snapshot testing workflows that run on every PR:
+
+**Automatic Verification:**
+- Runs on every PR and push to main/develop branches
+- Verifies UI matches reference snapshots
+- Uploads comparison images as artifacts on failure
+- Posts PR comments with detailed results and instructions
+
+**PR Comment Commands:**
+
+Control snapshot testing directly from PR comments:
+
+| Command | Description |
+|---------|-------------|
+| `/record-snapshots` | Records new snapshots and commits them to the PR |
+| `/update-snapshots` | Alias for `/record-snapshots` |
+| `/verify-snapshots` | Manually re-runs snapshot verification without making changes |
+
+**Example Workflow:**
+
+1. Make UI changes and push to your PR
+2. Snapshot tests fail in CI (expected for intentional changes)
+3. Review the failure artifacts to see visual differences
+4. If changes are correct, comment `/record-snapshots` on the PR
+5. GitHub Actions will automatically:
+   - Record new baseline snapshots
+   - Commit them to your PR branch
+   - Re-run verification tests
+   - Post results as a PR comment
+
+**Manual Re-verification:**
+
+If you need to re-run tests without pushing new commits:
 ```
-/record-snapshots
+/verify-snapshots
 ```
 
-GitHub Actions will automatically record and commit new snapshots to your PR!
+This is useful for:
+- Checking if a fix resolved snapshot failures
+- Re-running tests after infrastructure changes
+- Validating snapshots after rebasing
+
+### Snapshot Baseline Images
+
+Reference snapshot images are stored in `library/src/test/resources/roborazzi/`:
+- **48+ PNG files** - One per test scenario
+- **Automatically generated** - First run of `/record-snapshots` creates baselines
+- **Version controlled** - Committed with tests for consistent CI/CD
+- **Visual regression detection** - Pixel-perfect comparison on every PR
 
 For detailed testing documentation, see [library/SNAPSHOT_TESTING.md](library/SNAPSHOT_TESTING.md).
 
@@ -319,11 +369,48 @@ For detailed testing documentation, see [library/SNAPSHOT_TESTING.md](library/SN
 The library uses Roborazzi for snapshot testing to prevent visual regressions. All UI components are tested across multiple configurations using JVM-based tests (no emulator required).
 
 **Test Coverage:**
-- Component Tests (~25): Individual UI elements (ColorWheel, Sliders, PreviewBox)
-- ColorPicker Tests (~10): Full picker configurations
-- Dialog & Config Tests (~15): Dialogs, preferences, devices, themes, locales
+- **Component Tests (~25)**: Individual UI elements (ColorWheel, Sliders, PreviewBox)
+  - Various wheel types (Flower, Circle) with different densities
+  - Sliders with multiple lightness and alpha values
+  - Color preview boxes with different colors
+- **ColorPicker Tests (~10)**: Full picker configurations
+  - Feature combinations (with/without sliders, color edit)
+  - Different initial colors and wheel types
+- **Dialog & Config Tests (~15)**: Dialogs, preferences, devices, themes, locales
+  - ColorPickerDialog in various states
+  - ColorPickerPreferenceItem configurations
+  - Multiple device sizes (phone, tablet, landscape)
+  - Light and dark Material3 themes
+  - RTL locales (Arabic, Hebrew)
 
-See the [Snapshot Testing Guide](library/SNAPSHOT_TESTING.md) for more information.
+**GitHub Actions Workflows:**
+
+The project includes comprehensive CI/CD workflows in `.github/workflows/snapshot-tests.yml`:
+
+1. **verify-snapshots** (Auto-triggered)
+   - Runs on: PR creation/update, push to main/develop
+   - Action: Verifies UI matches reference snapshots
+   - On failure: Uploads artifacts and posts detailed PR comment
+
+2. **record-snapshots** (Comment-triggered)
+   - Trigger: Comment `/record-snapshots` or `/update-snapshots` on PR
+   - Action: Records new baseline snapshots and commits to PR
+   - Result: Posts confirmation comment with update status
+
+3. **verify-snapshots-on-command** (Comment-triggered)
+   - Trigger: Comment `/verify-snapshots` on PR
+   - Action: Manually re-runs verification without changes
+   - Result: Posts verification results with pass/fail status
+
+**Contributing:**
+
+When contributing UI changes:
+1. Run tests locally: `./gradlew :library:verifySnapshots`
+2. If intentional changes cause failures, update locally: `./gradlew :library:recordSnapshots`
+3. Commit both code and snapshot changes together
+4. Alternatively, use `/record-snapshots` command on your PR
+
+See the [Snapshot Testing Guide](library/SNAPSHOT_TESTING.md) for comprehensive documentation.
 
 ## Documentation
 
