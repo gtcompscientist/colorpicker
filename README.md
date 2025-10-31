@@ -5,7 +5,7 @@ Color Picker
 
 ![icon](https://github.com/QuadFlask/colorpicker/blob/master/app/src/main/res/drawable-xxxhdpi/ic_launcher.png)
 
-simple android color picker with color wheel and lightness bar.
+A modern, Compose-first Android color picker library with interactive color wheels, sliders, and comprehensive Material Design 3 support.
 
 [<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Get_it_on_Google_play.svg/800px-Get_it_on_Google_play.svg.png" width="150px">](https://play.google.com/store/apps/details?id=co.csadev.colorpicker.sample)
 
@@ -25,98 +25,256 @@ simple android color picker with color wheel and lightness bar.
 
 ![screenshot.png](https://github.com/QuadFlask/colorpicker/blob/master/screenshot/screenshot.png)
 
-## How to add dependency?
+## Features
 
-This library is not released in Maven Central, but instead you can use [JitPack](https://jitpack.io)
+- **100% Jetpack Compose** - Modern declarative UI
+- **Reactive State Management** - Compose-native state with `@Stable` optimization
+- **Flow-Based Events** - Reactive event handling with Kotlin SharedFlow
+- **Material Design 3** - Full Material3 theming support
+- **Multiple Wheel Types** - Flower (organic) and Circle (precise) rendering styles
+- **Complete Customization** - Alpha, lightness, density, colors all configurable
+- **Dialog & Preference Support** - Ready-to-use dialog and DataStore integration
+- **Comprehensive Testing** - 50+ snapshot tests with Roborazzi
+- **RTL Support** - Right-to-left layout support
+- **Accessibility** - Full semantic annotations for screen readers
 
-add remote maven url in `allprojects.repositories`
+## Architecture
 
-```groovy
-allprojects {
-	repositories {
-		maven { url "https://jitpack.io" }
-	}
+This library uses modern Android architecture patterns:
+
+### State Management
+- **ColorPickerState** - Immutable data class with `@Stable` annotation for Compose optimization
+- **rememberColorPickerState()** - Composable state factory following Compose best practices
+- Smart recomposition ensures only affected UI components update
+
+### Event System
+- **Flow-based events** - Uses Kotlin `SharedFlow` for reactive event handling
+- **Two event types**:
+  - `ColorChanged` - Emitted during user interaction (dragging, sliding)
+  - `ColorSelected` - Emitted when user finalizes selection (touch release)
+- Coroutine-friendly with suspend functions
+
+### Rendering Engine
+- **Strategy Pattern** - Pluggable renderers for different wheel types
+- **Canvas-based** - High-performance hardware-accelerated drawing
+- **HSV Color Space** - Intuitive hue-saturation-value selection
+- Two implementations:
+  - `FlowerColorWheelRenderer` - Organic petal-like appearance
+  - `SimpleColorWheelRenderer` - Clean uniform circles
+
+### UI Components
+All components are Composable functions following Material Design 3:
+- `ColorPicker` - Complete color picking interface
+- `ColorWheel` - Interactive HSV color wheel
+- `LightnessSlider` - Brightness adjustment
+- `AlphaSlider` - Transparency control
+- `ColorPreviewBox` - Visual color display
+- `ColorPickerDialog` - Material3 AlertDialog wrapper
+- `ColorPickerPreference` - DataStore preference integration
+
+## Requirements
+
+- **Minimum SDK**: Android API 24+ (Android 7.0)
+- **Kotlin**: 2.2.20+
+- **Compose BOM**: 2025.09.01+
+- **Java**: 17+
+
+## Installation
+
+This library is not released in Maven Central, but you can use [JitPack](https://jitpack.io).
+
+### Gradle (Kotlin DSL)
+
+Add JitPack repository in your root `settings.gradle.kts`:
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
 }
 ```
 
-then add a library dependency
+Then add the library dependency in your module `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    implementation("com.github.QuadFlask:colorpicker:0.0.13")
+
+    // Required dependencies
+    implementation(platform("androidx.compose:compose-bom:2025.09.01"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+}
+```
+
+### Gradle (Groovy)
+
+In `settings.gradle`:
+
+```groovy
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
+}
+```
+
+In `build.gradle`:
 
 ```groovy
 dependencies {
-	compile 'com.github.QuadFlask:colorpicker:0.0.13'
+    implementation 'com.github.QuadFlask:colorpicker:0.0.13'
+
+    // Required dependencies
+    implementation platform('androidx.compose:compose-bom:2025.09.01')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.datastore:datastore-preferences:1.1.1'
 }
 ```
 
-or, you can manually download `aar` and put into your project's `libs` directory.
+### Manual Installation
 
-and add dependency
+Alternatively, download the `.aar` from [releases](https://github.com/QuadFlask/colorpicker/releases) and add it to your project:
 
-```groovy
+```kotlin
 dependencies {
-	compile(name:'[arrFileName]', ext:'aar')
+    implementation(files("libs/colorpicker.aar"))
 }
 ```
-
-> check out latest version at [releases](https://github.com/QuadFlask/colorpicker/releases)
 
 ## Usage
 
-As a dialog
+### Quick Start - Simple Color Picker
 
-```java
-ColorPickerDialogBuilder
-	.with(context)
-	.setTitle("Choose color")
-	.initialColor(currentBackgroundColor)
-	.wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-	.density(12)
-	.setOnColorSelectedListener(new OnColorSelectedListener() {
-		@Override
-		public void onColorSelected(int selectedColor) {
-			toast("onColorSelected: 0x" + Integer.toHexString(selectedColor));
-		}
-	})
-	.setPositiveButton("ok", new ColorPickerClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-			changeBackgroundColor(selectedColor);
-		}
-	})
-	.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-		}
-	})
-	.build()
-	.show();
+```kotlin
+import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
+import co.csadev.colorpicker.compose.ColorPicker
+
+@Composable
+fun MyScreen() {
+    var selectedColor by remember { mutableStateOf(Color.Blue) }
+
+    ColorPicker(
+        initialColor = selectedColor,
+        showAlphaSlider = true,
+        showLightnessSlider = true,
+        onColorSelected = { color ->
+            selectedColor = color
+        }
+    )
+}
 ```
 
-As a widget
+### As a Dialog
 
-```xml
-	<co.csadev.colorpicker.ColorPickerView
-		android:id="@+id/color_picker_view"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		app:alphaSlider="true"
-		app:density="12"
-		app:lightnessSlider="true"
-		app:wheelType="FLOWER"
-		app:lightnessSliderView="@+id/v_lightness_slider"
-	    app:alphaSliderView="@+id/v_alpha_slider"
-		/>
+```kotlin
+@Composable
+fun DialogExample() {
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedColor by remember { mutableStateOf(Color.Green) }
 
-	<co.csadev.colorpicker.slider.LightnessSlider
-		android:id="@+id/v_lightness_slider"
-		android:layout_width="match_parent"
-		android:layout_height="48dp"
-		/>
+    Button(onClick = { showDialog = true }) {
+        Text("Pick Color")
+    }
 
-	<co.csadev.colorpicker.slider.AlphaSlider
-		android:id="@+id/v_alpha_slider"
-		android:layout_width="match_parent"
-		android:layout_height="48dp"
-		/>
+    if (showDialog) {
+        ColorPickerDialog(
+            onDismissRequest = { showDialog = false },
+            onColorSelected = { color ->
+                selectedColor = color
+                showDialog = false
+            },
+            initialColor = selectedColor,
+            title = "Choose a Color"
+        )
+    }
+}
+```
+
+### With Event Handling
+
+```kotlin
+@Composable
+fun EventHandlingExample() {
+    var currentColor by remember { mutableStateOf(Color.Yellow) }
+    var previewColor by remember { mutableStateOf(Color.Yellow) }
+
+    Column {
+        // Live preview while dragging
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .background(previewColor)
+        )
+
+        ColorPicker(
+            initialColor = currentColor,
+            onColorChanged = { color ->
+                // Called while dragging
+                previewColor = color
+            },
+            onColorSelected = { color ->
+                // Called when released
+                currentColor = color
+                previewColor = color
+            }
+        )
+    }
+}
+```
+
+### As a Preference
+
+```kotlin
+@Composable
+fun PreferencesExample() {
+    val context = LocalContext.current
+    val dataStore = remember { context.dataStore }
+    val themeColor by dataStore.getColorFlow(
+        key = "theme_color",
+        defaultColor = Color.Blue
+    ).collectAsState(initial = Color.Blue)
+    val scope = rememberCoroutineScope()
+
+    ColorPickerPreferenceItem(
+        title = "Theme Color",
+        summary = "Choose your app theme color",
+        color = themeColor,
+        onColorChange = { newColor ->
+            scope.launch {
+                dataStore.saveColor("theme_color", newColor)
+            }
+        }
+    )
+}
+```
+
+### Just the Color Wheel
+
+```kotlin
+@Composable
+fun ColorWheelExample() {
+    var selectedColor by remember { mutableStateOf(Color.Red) }
+
+    ColorWheel(
+        wheelType = ColorPickerState.WheelType.FLOWER,
+        density = 12,
+        lightness = 1f,
+        alpha = 1f,
+        onColorSelected = { color ->
+            selectedColor = color
+        }
+    )
+}
 ```
 
 ## Testing
@@ -167,11 +325,71 @@ The library uses Roborazzi for snapshot testing to prevent visual regressions. A
 
 See the [Snapshot Testing Guide](library/SNAPSHOT_TESTING.md) for more information.
 
-## To do
+## Documentation
 
-* gradle support
-* performance improvement
-* refactoring
+For comprehensive guides and detailed information, see:
+
+- **[HOW_TO.md](HOW_TO.md)** - Complete usage guide with all features and examples
+  - Installation and setup
+  - Basic and advanced usage patterns
+  - State management techniques
+  - Event handling
+  - Preferences integration with DataStore
+  - Migration from View-based library
+  - Best practices and troubleshooting
+
+- **[COLORWHEEL_USAGE.md](COLORWHEEL_USAGE.md)** - Detailed color wheel documentation
+  - Flower vs Circle wheel types
+  - Customization options (density, lightness, alpha)
+  - Synchronized sliders
+  - Performance tips
+  - Responsive layouts
+
+- **[library/SNAPSHOT_TESTING.md](library/SNAPSHOT_TESTING.md)** - Testing guide
+  - Running snapshot tests
+  - PR-based snapshot updates
+  - Test coverage details
+  - CI/CD integration
+  - Contributing guidelines
+
+- **[UpdateCompose.md](UpdateCompose.md)** - Architecture migration details
+  - Migration strategy from View to Compose
+  - Technical implementation details
+  - Phase-by-phase breakdown
+  - Breaking changes and compatibility
+
+## Sample App
+
+The repository includes a comprehensive sample app (`app/` module) demonstrating all features across 8 screens:
+
+1. **SimplestExampleScreen** - Minimal usage
+2. **FullFeaturedScreen** - All options enabled
+3. **CustomizableScreen** - Individual components
+4. **DialogsScreen** - Dialog configurations
+5. **SlidersExampleScreen** - Standalone sliders
+6. **EventHandlingScreen** - Live vs confirmed colors
+7. **ComparisonScreen** - Wheel type comparison
+8. **PreferencesScreen** - DataStore persistence
+
+Run the sample app to see all features in action!
+
+## Project Status
+
+**✅ Completed:**
+- ✅ Migrated to Jetpack Compose
+- ✅ Modern Kotlin architecture with coroutines and Flow
+- ✅ Material Design 3 integration
+- ✅ Comprehensive snapshot testing (50+ tests)
+- ✅ DataStore preferences support
+- ✅ CI/CD with GitHub Actions
+- ✅ Full documentation
+
+**🚧 In Progress / Future:**
+- Performance optimization for high-density wheels (100+ density)
+- Gradle Maven Central publishing
+- Compose Multiplatform support
+- Custom color palette management
+- Color harmony suggestions (complementary, triadic, etc.)
 
 ## License
 
