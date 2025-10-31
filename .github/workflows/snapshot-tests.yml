@@ -35,15 +35,23 @@ jobs:
         id: check
         run: |
           COMMENT="${{ github.event.comment.body }}"
-          if [[ "$COMMENT" == "/record-snapshots" ]] || [[ "$COMMENT" == "/update-snapshots" ]]; then
+          # Trim whitespace for comparison
+          COMMENT_TRIMMED=$(echo "$COMMENT" | xargs)
+
+          echo "Comment received: '$COMMENT_TRIMMED'"
+
+          if [[ "$COMMENT_TRIMMED" == "/record-snapshots" ]] || [[ "$COMMENT_TRIMMED" == "/update-snapshots" ]]; then
             echo "should-record=true" >> $GITHUB_OUTPUT
             echo "should-verify=false" >> $GITHUB_OUTPUT
-          elif [[ "$COMMENT" == "/verify-snapshots" ]]; then
+            echo "Command matched: record snapshots"
+          elif [[ "$COMMENT_TRIMMED" == "/verify-snapshots" ]]; then
             echo "should-record=false" >> $GITHUB_OUTPUT
             echo "should-verify=true" >> $GITHUB_OUTPUT
+            echo "Command matched: verify snapshots"
           else
             echo "should-record=false" >> $GITHUB_OUTPUT
             echo "should-verify=false" >> $GITHUB_OUTPUT
+            echo "No matching command found"
           fi
 
       - name: Get PR info
